@@ -1,0 +1,78 @@
+ServerSelectionScreen {
+    align: center middle;
+}
+
+#server_select {
+    width: 50;
+}
+
+ActionSelectionScreen {
+    align: center middle;
+}
+
+#action_select {
+    width: 50;
+}
+
+RightColumn {
+    width: 7fr;
+    height: 99vh;
+    border: round $primary;
+}
+
+LeftColumn {
+    width: 3fr;
+}
+
+GraphWidget {
+    width: 1fr;
+    margin_right: 1;
+    margin_left: 1;
+
+}
+
+.graphs_row {
+    height: 1fr;
+    margin_bottom: 1;
+}
+
+DataTable {
+    border: round $primary;
+    scrollbar-size: 1 1;
+}
+
+NodeWidget {
+    height: 2fr;
+}
+
+LxcWidget {
+    height: 4fr;
+}
+
+QemuWidget {
+    height: 4fr;
+}
+
+.focused {
+    border: round $accent
+}
+
+.unfocused {
+    border: round $primary
+}
+
+FilterScreen {
+    align: center middle;
+}
+
+#input_filter {
+    width: 50;
+}
+
+.details_left {
+    width: 2fr;
+}
+.details_right {
+    width: 4fr;
+}
+

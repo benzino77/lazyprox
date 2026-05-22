@@ -1,0 +1,32 @@
+[project]
+name = "lazyprox"
+license = "MIT"
+version = "0.1.0"
+description = "Proxmox TUI"
+keywords = [ "proxmox", "terminal", "TUI", "client", "console" ]
+readme = "README.md"
+authors = [
+    { name = "Piotr Antczak", email = "antczak.piotr@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "proxmoxer>=2.3.0",
+    "pydantic>=2.13.4",
+    "requests>=2.34.2",
+    "textual>=8.2.6",
+    "textual-plotext>=1.0.1",
+]
+
+[project.scripts]
+lazyprox = "lazyprox:main"
+
+[build-system]
+requires = ["uv_build>=0.9.27,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "textual-dev>=1.8.0",
+]
