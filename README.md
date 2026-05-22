@@ -33,4 +33,4 @@ Everything you do, you do on your own responsibility. I do not take any responsi
 
 ## License
 
-LazyProx is licensed under the [MIT license](./docs/LICENSE).
+LazyProx is licensed under the [MIT license](LICENSE).
