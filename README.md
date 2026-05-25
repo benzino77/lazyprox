@@ -44,7 +44,7 @@ to uninstall run `pipx uninstall lazyprox`
 
 To run the tool, simply run `lazyprox` in your terminal. To get best experience you should use `Nerd Font` family fonts in your terminal.
 
-Although it is rather easy to get information about the structure of the configuration file from the code, and what needs to be configured on the proxmox server side, you can also get it in a more user-friendly format by buying me a coffee. If you want to support the project and get the instructions on how to create the configuration file with all the necessary details and examples in PDF format, you can do so via [Ko-fi](https://ko-fi.com/benzino77).
+Although it is rather easy to get information about the structure of the configuration file from the code, and what needs to be configured on the proxmox server side, you can also get it in a more user-friendly format by buying me a coffee. If you want to support the project and get the instructions on how to create the configuration file with all the necessary details and examples in PDF format, you can do so via [Ko-fi](https://ko-fi.com/s/353196d42e).
 
 ## Disclaimer
 
