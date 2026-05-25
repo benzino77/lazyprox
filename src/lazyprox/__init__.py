@@ -17,6 +17,9 @@ def main() -> None:
     except ValidationError:
         print(f"Something went wrong when loading config file. Please check your configuration against the documentation.", file=sys.stderr)
         sys.exit(1)
+    except FileNotFoundError:
+        print("Cannot find lazyprox config file.", file=sys.stderr)
+        sys.exit(1)
     except Exception as e:
         print(f"Something went wrong: {e}", file=sys.stderr)
         sys.exit(2)
