@@ -7,7 +7,7 @@
   </defs>
 
   <!-- Icon -->
-  <rect x="24" y="24" width="172" height="172" rx="28" fill="#111827"/>
+  <rect x="24" y="24" width="172" height="172" rx="28" fill="#414652"/>
 
   <!-- Minimal terminal frame -->
   <rect x="52" y="52" width="116" height="116" rx="16" stroke="url(#accent)" stroke-width="10"/>
@@ -22,7 +22,7 @@
   <rect x="130" y="114" width="18" height="18" rx="4" fill="#FDBA74"/>
 
   <!-- Wordmark -->
-  <g fill="#111827">
+  <g fill="#414652">
     <text x="230" y="122"
       font-family="Inter, JetBrains Mono, Menlo, monospace"
       font-size="64"
