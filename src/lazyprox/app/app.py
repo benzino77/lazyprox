@@ -9,10 +9,10 @@ from textual.timer import Timer
 from textual import work
 from textual.widgets import DataTable
 
+from .resource_actions import ResourceActions
 from lazyprox.common import Config
 from lazyprox.data import ProxmoxData
 from lazyprox.screens import WaitingScreen, ServerSelectionScreen, DashboardScreen, FilterScreen, ActionSelectionScreen
-from lazyprox.widgets import NodeWidget, LxcWidget, QemuWidget
 
 
 class LazyProx(App):
@@ -234,39 +234,24 @@ class LazyProx(App):
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         # when "enter" is pressed on DataTable widget, the action screen should be displayed
+        resource_actions = ResourceActions(event)
+        list_items = resource_actions.get_actions_list()
+        resource_name = resource_actions.get_resource_name()
 
-        list_items: list = []
-        resource_type: str = ""
-        resource_name: str = event.data_table.get_row(event.row_key)[0]
-        if isinstance(event.data_table, NodeWidget):
-            status = event.data_table.get_row(event.row_key)[1]
-            resource_type = "node"
-            if status == "online":
-                list_items = ["Shutdown", "Reboot", "SSH"]
-            else:
-                list_items = ["Start"]
-        if isinstance(event.data_table, LxcWidget):
-            status = event.data_table.get_row(event.row_key)[2]
-            resource_type = "lxc"
-            if status == "running":
-                list_items = ["Shutdown", "Reboot", "Stop", "SSH"]
-            else:
-                list_items = ["Start",]
-        if isinstance(event.data_table, QemuWidget):
-            status = event.data_table.get_row(event.row_key)[2]
-            resource_type = "qemu"
-            if status == "running":
-                list_items = ["Shutdown", "Reboot", "Pause",
-                              "Hibernate", "Stop", "Reset", "SSH"]
-            else:
-                list_items = ["Start",]
-
-        def check_action(text: str | None) -> None:
+        def check_action(selected_action: str | None) -> None:
             # for now only ssh is available, other actions needs to be implemented
-            if text.lower() == "ssh":
+            if selected_action == "SSH":
                 with self.suspend():
                     os.system(f"ssh {resource_name}")
                 self.app.refresh()
+            else:
+                try:
+                    resource_actions.perform_action(selected_action)
+                    self.notify(message=f"{selected_action} on {resource_name} successful", title="Action",
+                                severity="information")
+                except Exception as e:
+                    self.notify(message=str(
+                        e), title="Something went wrong...", severity="error")
 
         self.push_screen(ActionSelectionScreen(items=list_items), check_action)
 
