@@ -1,4 +1,4 @@
-- [ ] Implement actions for nodes, containers and virtual machines - for now only SSH action is implemented
+- [x] Implement actions for nodes, containers and virtual machines - for now only SSH action is implemented
 - [ ] Add other views - for example a view of tasks fro the server/cluster
 - [ ] Upload to PyPI and add installation instructions for pip
 - [ ] Check if the tool can be run via docker and add instructions for that
