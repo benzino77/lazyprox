@@ -41,7 +41,7 @@ class QemuSummaryWidget(BaseSummaryView):
             return
 
         node = ProxmoxData.get_guest_information(
-            node_name=data[-1], type="qemu", vmid=data[1])
+            node_name=data[-1], resource_type="qemu", vmid=data[1])
         status_current = node.get("status/current", {})
 
         uptime_str = calculate_uptime(status_current.get("uptime", 0))

@@ -45,7 +45,7 @@ class LXCSummaryWidget(BaseSummaryView):
             return
 
         node = ProxmoxData.get_guest_information(
-            node_name=data[-1], type="lxc", vmid=data[1])
+            node_name=data[-1], resource_type="lxc", vmid=data[1])
         status_current = node.get("status/current", {})
 
         uptime_str = calculate_uptime(node.get("uptime", 0))

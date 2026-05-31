@@ -51,7 +51,7 @@ class QemuGraphWidget(BaseGraphView):
         # node = ProxmoxData.get_qemu_information(
         #     node_name=data[-1], qemu_id=int(data[1]))
         node = ProxmoxData.get_guest_information(
-            node_name=data[-1], type="qemu", vmid=data[1])
+            node_name=data[-1], resource_type="qemu", vmid=data[1])
         rrddata = node.get("rrddata", [])
         if not rrddata:
             return

@@ -48,10 +48,10 @@ class _ProxmoxData():
 
         return node_info
 
-    def get_guest_information(self, node_name: str, type: Literal["lxc", "qemu"], vmid: str) -> dict:
+    def get_guest_information(self, node_name: str, resource_type: Literal["lxc", "qemu"], vmid: str) -> dict:
         guest_info = {}
         for g in self.p_prox_resources.get(
-                f"nodes/{node_name}/{type}", []):
+                f"nodes/{node_name}/{resource_type}", []):
             if g["vmid"] == int(vmid):
                 guest_info = deepcopy(g)
                 break
@@ -61,9 +61,9 @@ class _ProxmoxData():
 
         guest_info["node"] = node_name
         guest_info["status/current"] = self.p_prox_resources.get(
-            f"nodes/{node_name}/{type}/{vmid}/status/current", {})
+            f"nodes/{node_name}/{resource_type}/{vmid}/status/current", {})
         guest_info["rrddata"] = self.p_prox_resources.get(
-            f"nodes/{node_name}/{type}/{vmid}/rrddata", {})
+            f"nodes/{node_name}/{resource_type}/{vmid}/rrddata", {})
 
         return guest_info
 

@@ -52,7 +52,7 @@ class LXCGraphWidget(BaseGraphView):
         # node = ProxmoxData.get_lxc_information(
         #     node_name=data[-1], lxc_id=int(data[1]))
         node = ProxmoxData.get_guest_information(
-            node_name=data[-1], type="lxc", vmid=data[1])
+            node_name=data[-1], resource_type="lxc", vmid=data[1])
         rrddata = node.get("rrddata", [])
 
         if not rrddata:

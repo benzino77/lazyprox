@@ -107,11 +107,11 @@ class LazyProx(App):
             ProxmoxData.refresh_api_information(f"nodes/{node_name}/rrddata")
 
     @work(thread=True)
-    def refresh_nodes_data(self, type: Literal["basic", "rrddata"]) -> None:
+    def refresh_nodes_data(self, data_type: Literal["basic", "rrddata"]) -> None:
         try:
-            if type == "basic":
+            if data_type == "basic":
                 self.refresh_basic_nodes_data()
-            if type == "rrddata":
+            if data_type == "rrddata":
                 self.refresh_rrd_nodes_data()
             msg = self.NodesUpdated(
                 {"success": True, "text": "Nodes data updated successfully"})
@@ -201,12 +201,12 @@ class LazyProx(App):
             # "product" function is used to produce pairs of type and guest for which we want to collect data,
             # so we will have pairs like ("basic", "lxc"), ("rrddata", "lxc"), ("basic", "qemu"), ("rrddata", "qemu")
             pairs = list(product(["basic", "rrddata"], ["lxc", "qemu"]))
-            for type, guest_type in pairs:
+            for data_type, guest_type in pairs:
                 # collect data asap
-                self.refresh_guests_data(type, guest_type)
+                self.refresh_guests_data(data_type, guest_type)
                 # then start intervals to collect data in the background
-                self.timers.append(self.set_interval(interval if type == "basic" else rrd_interval,
-                                   lambda t=type, g=guest_type: self.refresh_guests_data(t, g)))
+                self.timers.append(self.set_interval(interval if data_type == "basic" else rrd_interval,
+                                   lambda t=data_type, g=guest_type: self.refresh_guests_data(t, g)))
 
         # update widgets if the data is available it will display gathered information
         # in other case the data in widgets will be cleared
@@ -239,7 +239,6 @@ class LazyProx(App):
         resource_name = resource_actions.get_resource_name()
 
         def check_action(selected_action: str | None) -> None:
-            # for now only ssh is available, other actions needs to be implemented
             if selected_action == "SSH":
                 with self.suspend():
                     os.system(f"ssh {resource_name}")

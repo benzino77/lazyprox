@@ -22,40 +22,39 @@ class ResourceActions:
         }
         self.event = event
 
-    def _get_status(self) -> str:
-        type = self.event.data_table.table_type
+    def _get_status(self, resource_type: str) -> str:
 
-        if type == "node":
+        if resource_type == "node":
             return self.event.data_table.get_row(self.event.row_key)[1]
-        if type == "lxc" or type == "qemu":
+        if resource_type == "lxc" or resource_type == "qemu":
             return self.event.data_table.get_row(self.event.row_key)[2]
 
         raise TypeError(f"Unknown DataTable type: {type}")
 
     def get_actions_list(self) -> list[str | None]:
-        type = self.event.data_table.table_type
-        status = self._get_status()
+        resource_type = self.event.data_table.table_type
+        status = self._get_status(resource_type)
 
-        return self.actions.get(type).get(status, [])
+        return self.actions.get(resource_type).get(status, [])
 
     def get_resource_name(self) -> str:
         return self.event.data_table.get_row(self.event.row_key)[0]
 
     def perform_action(self, selected_action: str) -> None:
         action = selected_action.lower()
-        type = self.event.data_table.table_type
+        resource_type = self.event.data_table.table_type
         node = self.event.data_table.get_row(self.event.row_key)[-1]
         name = self.event.data_table.get_row(self.event.row_key)[0]
         vmid = self.event.data_table.get_row(self.event.row_key)[1]
 
-        if type == "lxc":
+        if resource_type == "lxc":
             ProxmoxData.prox.nodes(node).lxc(vmid).status.post(action)
-        if type == "qemu":
+        if resource_type == "qemu":
             # hibernate action in fact is named "suspend" and needs to pass parameter "todisk"
             if action == "hibernate":
                 ProxmoxData.prox.nodes(node).qemu(
                     vmid).status.post("suspend", todisk=1)
             else:
                 ProxmoxData.prox.nodes(node).qemu(vmid).status.post(action)
-        if type == "node":
+        if resource_type == "node":
             ProxmoxData.prox.nodes(name).status().post(command=action)
