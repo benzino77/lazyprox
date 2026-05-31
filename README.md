@@ -46,6 +46,14 @@ To run the tool, simply run `lazyprox` in your terminal. To get best experience 
 
 Although it is rather easy to get information about the structure of the configuration file from the code, and what needs to be configured on the proxmox server side, you can also get it in a more user-friendly format by buying me a coffee. If you want to support the project and get the instructions on how to create the configuration file with all the necessary details and examples in PDF format, you can do so via [Ko-fi](https://ko-fi.com/s/353196d42e).
 
+## Running in Docker
+
+You can also run LazyProx in a Docker container - you do not have to install it via `uv` or `pipx` directly on your system. You can build the Docker image using the provided `Dockerfile` and then run the container or you can pull the prebuilt image from github container registry.
+
+```
+docker run --name lazyprox -it --rm -v /path/to/config.toml:/config.toml ghcr.io/benzino77/lazyprox:latest -c /config.toml
+```
+
 ## Disclaimer
 
 Everything you do, you do on your own responsibility. I do not take any responsibility for damages or problems, that may arise as a result of using this solution or its products. It is provided "as is" without any warranties or guarantees. Use it at your own risk.

@@ -1,6 +1,6 @@
 - [x] Implement actions for nodes, containers and virtual machines - for now only SSH action is implemented
 - [ ] Add other views - for example a view of tasks fro the server/cluster
 - [ ] Upload to PyPI and add installation instructions for pip
-- [ ] Check if the tool can be run via docker and add instructions for that
+- [x] Check if the tool can be run via docker and add instructions for that
 - [ ] Add unit tests for the codebase
 - [ ] Refactor App class - it looks like the "mother of all classes" and it is doing too much - it should be split into smaller classes with single responsibility
