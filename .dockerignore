@@ -1,0 +1,10 @@
+.venv/
+.git/
+.gitignore
+.python-version
+__pycache__/
+*.egg-info
+*.pyc
+docs/
+playground/
+.agent/
