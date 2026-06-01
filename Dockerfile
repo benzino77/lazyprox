@@ -1,5 +1,7 @@
 FROM python:3.13-alpine
 
+LABEL org.opencontainers.image.description="Simple Proxmox TUI Manager"
+
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 RUN addgroup --system lazyprox && adduser --system --ingroup lazyprox lazyprox
