@@ -29,33 +29,22 @@ class LazyProx(App):
                "waiting": WaitingScreen,
                "dashboard": DashboardScreen}
 
-    class ProxmoxInitialized(Message):
-        """This is a message send when application starts or the new server is chosen"""
-
-        def __init__(self, msg: dict = {}):
-            self.msg = msg
+    class _AppMessage(Message):
+        def __init__(self, msg: dict | None = None):
+            self.msg = msg or {}
             super().__init__()
 
-    class NodesUpdated(Message):
-        """This is a message send when information about proxmox servers/nodes is updated"""
+    class ProxmoxInitialized(_AppMessage):
+        """Sent when app starts or a server is selected."""
 
-        def __init__(self, msg: dict = {}):
-            self.msg = msg
-            super().__init__()
+    class NodesUpdated(_AppMessage):
+        """Sent when node data is refreshed."""
 
-    class LxcsUpdated(Message):
-        """This is a message send when information about lxc containers is updated"""
+    class LxcsUpdated(_AppMessage):
+        """Sent when LXC container data is refreshed."""
 
-        def __init__(self, msg: dict = {}):
-            self.msg = msg
-            super().__init__()
-
-    class QemusUpdated(Message):
-        """This is a message send when information about qemu vms is updated"""
-
-        def __init__(self, msg: dict = {}):
-            self.msg = msg
-            super().__init__()
+    class QemusUpdated(_AppMessage):
+        """Sent when QEMU VM data is refreshed."""
 
     def __init__(self):
         self.timers: list[Timer] = []
