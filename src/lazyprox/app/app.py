@@ -13,6 +13,7 @@ from .resource_actions import ResourceActions
 from lazyprox.common import Config
 from lazyprox.data import ProxmoxData
 from lazyprox.screens import WaitingScreen, ServerSelectionScreen, DashboardScreen, FilterScreen, ActionSelectionScreen
+from lazyprox.widgets import NodeWidget, LxcWidget, QemuWidget
 
 
 class LazyProx(App):
@@ -210,16 +211,16 @@ class LazyProx(App):
 
         # update widgets if the data is available it will display gathered information
         # in other case the data in widgets will be cleared
-        for widget_name in ["NodeWidget", "LxcWidget", "QemuWidget"]:
+        for widget_type in [NodeWidget, LxcWidget, QemuWidget]:
             try:
-                widget = self.screen.query_one(widget_name)
+                widget = self.screen.query_one(widget_type)
                 widget.filter_text = ""
                 widget.remove_border_indicator("(F)")
                 widget.update_table_data()
                 widget.action_scroll_top()
                 # set focus on the NodeWidget after Proxmox is initialized
                 self.screen.set_focus(
-                    widget) if widget_name == "NodeWidget" else None
+                    widget) if widget_type is NodeWidget else None
             except Exception:
                 continue
 
