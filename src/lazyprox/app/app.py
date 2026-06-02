@@ -51,25 +51,27 @@ class LazyProx(App):
         super().__init__()
 
     def _notify_error(self, message: str) -> None:
-        self.notify(message=message, title="Something went wrong...", severity="error")
+        self.notify(message=message,
+                    title="Something went wrong...", severity="error")
 
-    def handle_update_message(self, widget_name: str, msg: Message) -> None:
-        """
-        This is helper function to handle update message for nodes, lxcs and qemus widdgets
-        Args:
-            widget_name: name of the widget which should be updated
-            msg: message which is send with update status
-        Returns:
-            None
-        """
+    def handle_update_message(self, msg: Message) -> None:
         success = msg.msg["success"]
         text = msg.msg["text"]
         if not success:
             self._notify_error(text)
             return
 
+        widget_for_update: dict[type, type] = {
+            self.NodesUpdated: NodeWidget,
+            self.LxcsUpdated: LxcWidget,
+            self.QemusUpdated: QemuWidget,
+        }
+
+        widget_cls = widget_for_update.get(type(msg))
+        if widget_cls is None:
+            return
         try:
-            widget = self.screen.query_one(widget_name)
+            widget = self.screen.query_one(widget_cls)
             widget.update_table_data()
         except Exception:
             return
@@ -214,13 +216,13 @@ class LazyProx(App):
                 continue
 
     def on_lazy_prox_nodes_updated(self, nu: NodesUpdated) -> None:
-        self.handle_update_message("NodeWidget", nu)
+        self.handle_update_message(nu)
 
     def on_lazy_prox_lxcs_updated(self, lu: LxcsUpdated) -> None:
-        self.handle_update_message("LxcWidget", lu)
+        self.handle_update_message(lu)
 
     def on_lazy_prox_qemus_updated(self, qu: QemusUpdated) -> None:
-        self.handle_update_message("QemuWidget", qu)
+        self.handle_update_message(qu)
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         # when "enter" is pressed on DataTable widget, the action screen should be displayed
