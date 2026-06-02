@@ -50,6 +50,9 @@ class LazyProx(App):
         self.timers: list[Timer] = []
         super().__init__()
 
+    def _notify_error(self, message: str) -> None:
+        self.notify(message=message, title="Something went wrong...", severity="error")
+
     def handle_update_message(self, widget_name: str, msg: Message) -> None:
         """
         This is helper function to handle update message for nodes, lxcs and qemus widdgets
@@ -62,8 +65,7 @@ class LazyProx(App):
         success = msg.msg["success"]
         text = msg.msg["text"]
         if not success:
-            self.notify(
-                message=text, title="Something went wrong...", severity="error")
+            self._notify_error(text)
             return
 
         try:
@@ -169,10 +171,8 @@ class LazyProx(App):
         self.switch_screen("dashboard")
         success = pim.msg["success"]
         text = pim.msg["text"]
-        # something went wrong display popup with message
         if not success:
-            self.notify(
-                message=text, title="Something went wrong...", severity="error")
+            self._notify_error(text)
         else:
             # now we can start timers to update data in the background
             interval = Config.configuration.get(
@@ -239,8 +239,7 @@ class LazyProx(App):
                     self.notify(message=f"{selected_action} on {resource_name} successful", title="Action",
                                 severity="information")
                 except Exception as e:
-                    self.notify(message=str(
-                        e), title="Something went wrong...", severity="error")
+                    self._notify_error(str(e))
 
         self.push_screen(ActionSelectionScreen(items=list_items), check_action)
 
@@ -274,8 +273,7 @@ class LazyProx(App):
             self.notify(message=str(path), title="Dump file saved",
                         severity="information")
         except Exception as e:
-            self.notify(message=str(
-                e), title="Something went wrong...", severity="error")
+            self._notify_error(str(e))
 
     def action_quit(self) -> None:
         self.stop_timers()
