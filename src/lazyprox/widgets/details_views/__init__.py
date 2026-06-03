@@ -7,6 +7,7 @@ from .node_graph import NodeGraphWidget
 from .node_summary import NodeSummaryWidget
 from .qemu_graph import QemuGraphWidget
 from .qemu_summary import QemuSummaryWidget
+from .node_tasks import NodeTasksWidget
 
 __all__ = ["BaseGraphView", "BaseSummaryView", "GraphWidget", "LXCGraphWidget", "LXCSummaryWidget",
-           "NodeGraphWidget", "NodeSummaryWidget", "QemuGraphWidget", "QemuSummaryWidget"]
+           "NodeGraphWidget", "NodeSummaryWidget", "NodeTasksWidget", "QemuGraphWidget", "QemuSummaryWidget"]
