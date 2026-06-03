@@ -89,6 +89,9 @@ class _ProxmoxData():
             vms.extend(vms_on_node)
         return vms
 
+    def get_cluster_tasks(self) -> list:
+        return self.p_prox_resources.get("cluster/tasks", [])
+
     def dump_resources(self) -> Path:
         """Dump all resources to file"""
         dest: Path = Path(Config.configuration.get("application").get(
