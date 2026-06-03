@@ -100,13 +100,18 @@ class LazyProx(App):
             node_name: str = node["node"]
             ProxmoxData.refresh_api_information(f"nodes/{node_name}/rrddata")
 
+    def refresh_task_nodes_data(self) -> None:
+        ProxmoxData.refresh_api_information("cluster/tasks")
+
     @work(thread=True)
-    def refresh_nodes_data(self, data_type: Literal["basic", "rrddata"]) -> None:
+    def refresh_nodes_data(self, data_type: Literal["basic", "rrddata", "tasks"]) -> None:
         try:
             if data_type == "basic":
                 self.refresh_basic_nodes_data()
             if data_type == "rrddata":
                 self.refresh_rrd_nodes_data()
+            if data_type == "tasks":
+                self.refresh_task_nodes_data()
             msg = self.NodesUpdated(
                 {"success": True, "text": "Nodes data updated successfully"})
         except Exception as e:
@@ -152,6 +157,7 @@ class LazyProx(App):
             ProxmoxData.initialize()
             self.refresh_basic_nodes_data()
             self.refresh_rrd_nodes_data()
+            self.refresh_task_nodes_data()
             msg = self.ProxmoxInitialized(
                 {"success": True, "text": "Proxmox initialized successfully"})
         except Exception as e:
@@ -181,10 +187,15 @@ class LazyProx(App):
                 "application").get("refresh_interval")
             rrd_interval = Config.configuration.get(
                 "application").get("refresh_interval_rrddata")
+            tasks_interval = Config.configuration.get(
+                "application").get("refresh_interval_tasks")
             self.timers.append(self.set_interval(interval, lambda:
                                                  self.refresh_nodes_data("basic")))
             self.timers.append(self.set_interval(rrd_interval, lambda:
                                                  self.refresh_nodes_data("rrddata")))
+
+            self.timers.append(self.set_interval(tasks_interval, lambda:
+                                                 self.refresh_nodes_data("tasks")))
 
             # before starting intervals for guests lets get asynchronously their data
             # so it will be collected before timers collects data for the first time after interval

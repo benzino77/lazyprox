@@ -1,5 +1,6 @@
 ServerSelectionScreen {
     align: center middle;
+    width: 50;
 }
 
 #server_select {
@@ -36,21 +37,22 @@ GraphWidget {
     margin_bottom: 1;
 }
 
-DataTable {
+NodeWidget {
+    height: 2fr;
     border: round $primary;
     scrollbar-size: 1 1;
 }
 
-NodeWidget {
-    height: 2fr;
-}
-
 LxcWidget {
     height: 4fr;
+    border: round $primary;
+    scrollbar-size: 1 1;    
 }
 
 QemuWidget {
     height: 4fr;
+    border: round $primary;
+    scrollbar-size: 1 1;    
 }
 
 .focused {

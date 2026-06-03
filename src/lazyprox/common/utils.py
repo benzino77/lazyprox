@@ -9,7 +9,7 @@ def set_focus_border(handler: Widget) -> None:
         None
     """
     # get all DataTable widgets
-    data_table_widgets = handler.screen.query("DataTable")
+    data_table_widgets = handler.screen.query("LeftColumn DataTable")
     # set all widgets to class unfocused
     for widget in data_table_widgets:
         widget.remove_class("focused", "unfocused")

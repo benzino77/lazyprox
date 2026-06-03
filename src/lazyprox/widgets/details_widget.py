@@ -3,7 +3,7 @@ from typing import Literal
 from textual.app import ComposeResult
 from textual.widgets import ContentSwitcher
 
-from lazyprox.widgets.details_views import NodeSummaryWidget, NodeGraphWidget, LXCSummaryWidget, LXCGraphWidget, QemuSummaryWidget, QemuGraphWidget
+from lazyprox.widgets.details_views import NodeSummaryWidget, NodeGraphWidget, LXCSummaryWidget, LXCGraphWidget, QemuSummaryWidget, QemuGraphWidget, NodeTasksWidget
 
 
 class DetailsWidget(ContentSwitcher):
@@ -11,6 +11,7 @@ class DetailsWidget(ContentSwitcher):
     def compose(self) -> ComposeResult:
         yield NodeSummaryWidget(id="node_summary_widget")
         yield NodeGraphWidget(id="node_graphs_widget")
+        yield NodeTasksWidget(id="node_tasks_widget")
         yield LXCSummaryWidget(id="lxc_summary_widget")
         yield LXCGraphWidget(id="lxc_graphs_widget")
         yield QemuSummaryWidget(id="qemu_summary_widget")
@@ -28,6 +29,9 @@ class DetailsWidget(ContentSwitcher):
             elif details_mode == "graphs":
                 self.current = "node_graphs_widget"
                 self.query_one("NodeGraphWidget").update_data(data=data)
+            elif details_mode == "tasks":
+                self.current = "node_tasks_widget"
+                self.query_one("NodeTasksWidget").update_data(data=data)
         if selected_type == "lxc":
             if details_mode == "summary":
                 self.current = "lxc_summary_widget"
