@@ -1,5 +1,10 @@
 - [x] Implement actions for nodes, containers and virtual machines - for now only SSH action is implemented
+- [ ] Add question dialog for actions that require user confirmation - for example "Are you sure you want to stop this container?"
 - [ ] Add other views - for example a view of tasks fro the server/cluster
+  - [x] Add view for cluster tasks 
+  - [ ] Add details view for selected cluster task
+- [ ] Check possibility to add "bulk actions"
+- [ ] Check possibility to add action to migrate container/VM to another node if the cluster has more than one node
 - [ ] Upload to PyPI and add installation instructions for pip
 - [x] Check if the tool can be run via docker and add instructions for that
 - [ ] Add unit tests for the codebase
