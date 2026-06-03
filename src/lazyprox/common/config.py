@@ -19,6 +19,7 @@ class ProxmoxServerConfig(BaseModel):
 class ApplicationConfig(BaseModel):
     refresh_interval: Optional[float] = 10.0
     refresh_interval_rrddata: Optional[float] = 30.0
+    refresh_interval_tasks: Optional[float] = 15.0
     debug_dump_dest: Optional[str] = "lazyprox-dump.json"
     rrddata_timeframe: Optional[str] = "hour"  # timeframe for rrd data
     rrddata_cf: Optional[str] = "AVERAGE"  # consolidation function
