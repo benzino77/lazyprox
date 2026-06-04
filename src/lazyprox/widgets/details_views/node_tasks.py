@@ -69,7 +69,7 @@ class NodeTasksWidget(DataTable):
     def build_new_tasks_list(self) -> list[tuple]:
         new_list: list[tuple] = []
         tasks = ProxmoxData.get_cluster_tasks()
-        tasks.sort(key=lambda t: t.get("endtime", 0), reverse=True)
+        tasks.sort(key=lambda t: t.get("starttime", 0), reverse=True)
 
         for task in tasks:
             start_str = datetime.fromtimestamp(
