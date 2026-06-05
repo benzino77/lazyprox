@@ -1,6 +1,8 @@
 FROM python:3.13-alpine
 
 LABEL org.opencontainers.image.description="Simple Proxmox TUI Manager"
+LABEL org.opencontainers.image.source=https://github.com/benzino77/lazyprox
+LABEL org.opencontainers.image.licenses=MIT
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
