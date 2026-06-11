@@ -124,12 +124,18 @@ class LazyProx(App):
             self.post_message(msg)
 
     @work(thread=True)
-    def refresh_guests_data(self, data_type: Literal["basic", "rrddata"], guest_type: Literal["qemu", "lxc"]) -> None:
+    def refresh_guests_data(self, data_type: str, guest_type: Literal["qemu", "lxc"]) -> None:
+        """Refresh guests data
+        Args:
+            data_type: API path for the type of data to collect. 
+                Example: 
+                    nodes/{node_name}/{resource_type}/{vmid}/status/current
+                    nodes/{node_name}/{resource_type}/{vmid}/rrddata
+            guest_type: type of the guest for which data should be collected
+        Returns:
+            None
+        """
         guests = ProxmoxData.get_guests_list(guest_type)
-        path_suffix = {
-            "basic": "status/current",
-            "rrddata": "rrddata",
-        }[data_type]
 
         msg_cls = {
             "lxc": self.LxcsUpdated,
@@ -138,8 +144,8 @@ class LazyProx(App):
 
         try:
             for g in guests:
-                url = f"nodes/{g['node']}/{guest_type}/{g['vmid']}/{path_suffix}"
-                ProxmoxData.refresh_api_information(url)
+                ProxmoxData.refresh_api_information(data_type.format(
+                    node_name=g["node"], resource_type=guest_type, vmid=g["vmid"]))
 
             msg = msg_cls(
                 {"success": True,
@@ -179,6 +185,10 @@ class LazyProx(App):
         """
         Handler for ProxmoxInitialized message, this is called when Proxmox is initialized after server selection or application start
         It will start timers/intervals to refresh data (for nodes and guests) periodically.
+        Args:
+            pim: message with information about Proxmox initialization status
+        Returns:
+            None
         """
         self.switch_screen("dashboard")
         success = pim.msg["success"]
@@ -205,9 +215,10 @@ class LazyProx(App):
             # so it will be collected before timers collects data for the first time after interval
             # in other words we are doing it to avoid situation when the application is started and there is no data about guests
             # until the first interval is finished and data is collected for the first time
-            # "product" function is used to produce pairs of type and guest for which we want to collect data,
-            # so we will have pairs like ("basic", "lxc"), ("rrddata", "lxc"), ("basic", "qemu"), ("rrddata", "qemu")
-            pairs = list(product(["basic", "rrddata"], ["lxc", "qemu"]))
+            # "product" function is used to produce pairs of data type and guest type for which we want to collect data,
+            # so we will have pairs like ("status/current", "lxc"), ("rrddata", "lxc"), ("status/current", "qemu"), ("rrddata", "qemu")
+            pairs = list(
+                product([ProxmoxData.GUEST_STATUS, ProxmoxData.GUEST_RRDDATA], ["lxc", "qemu"]))
             for data_type, guest_type in pairs:
                 # collect data asap
                 self.refresh_guests_data(data_type, guest_type)
