@@ -86,22 +86,30 @@ class LazyProx(App):
         self.push_screen("waiting")
 
     def refresh_basic_nodes_data(self) -> None:
-        ProxmoxData.refresh_api_information("nodes")
-        nodes = ProxmoxData.p_prox_resources.get("nodes", [])
+        ProxmoxData.refresh_api_information(ProxmoxData.BASE_NODES)
+        nodes = ProxmoxData.p_prox_resources.get(ProxmoxData.BASE_NODES, [])
         for node in nodes:
             node_name: str = node["node"]
-            ProxmoxData.refresh_api_information(f"nodes/{node_name}/status")
-            ProxmoxData.refresh_api_information(f"nodes/{node_name}/qemu")
-            ProxmoxData.refresh_api_information(f"nodes/{node_name}/lxc")
+            ProxmoxData.refresh_api_information(
+                ProxmoxData.NODE_STATUS.format(node_name=node_name))
+            ProxmoxData.refresh_api_information(ProxmoxData.NODE_GUEST_DATA.format(
+                node_name=node_name, resource_type="qemu"))
+            ProxmoxData.refresh_api_information(
+                ProxmoxData.NODE_GUEST_DATA.format(node_name=node_name, resource_type="lxc"))
+            # ProxmoxData.refresh_api_information(f"nodes/{node_name}/status")
+            # ProxmoxData.refresh_api_information(f"nodes/{node_name}/qemu")
+            # ProxmoxData.refresh_api_information(f"nodes/{node_name}/lxc")
 
     def refresh_rrd_nodes_data(self) -> None:
-        nodes = ProxmoxData.p_prox_resources.get("nodes", [])
+        nodes = ProxmoxData.p_prox_resources.get(ProxmoxData.BASE_NODES, [])
         for node in nodes:
             node_name: str = node["node"]
-            ProxmoxData.refresh_api_information(f"nodes/{node_name}/rrddata")
+            ProxmoxData.refresh_api_information(
+                ProxmoxData.NODE_RRDDATA.format(node_name=node_name))
+            # ProxmoxData.refresh_api_information(f"nodes/{node_name}/rrddata")
 
     def refresh_task_nodes_data(self) -> None:
-        ProxmoxData.refresh_api_information("cluster/tasks")
+        ProxmoxData.refresh_api_information(ProxmoxData.CLUSTER_TASKS)
 
     @work(thread=True)
     def refresh_nodes_data(self, data_type: Literal["basic", "rrddata", "tasks"]) -> None:
