@@ -9,6 +9,14 @@ from lazyprox.common import Config
 
 
 class _ProxmoxData():
+    BASE_NODES: str = "nodes"
+    NODE_STATUS: str = "nodes/{node_name}/status"
+    NODE_RRDDATA: str = "nodes/{node_name}/rrddata"
+    NODE_GUEST_DATA: str = "nodes/{node_name}/{resource_type}"
+    GUEST_STATUS: str = "nodes/{node_name}/{resource_type}/{vmid}/status/current"
+    GUEST_RRDDATA: str = "nodes/{node_name}/{resource_type}/{vmid}/rrddata"
+    CLUSTER_TASKS: str = "cluster/tasks"
+
     def __init__(self):
         self.p_prox_resources: dict = {}
 
@@ -35,15 +43,15 @@ class _ProxmoxData():
         self.p_prox_resources[api] = info
 
     def get_node_information(self, node_name: str) -> dict:
-        nodes: list = self.p_prox_resources.get("nodes", [])
+        nodes: list = self.p_prox_resources.get(self.BASE_NODES, [])
         node_info = {}
         for node in nodes:
             if node["node"] == node_name:
                 node_info = deepcopy(node)
                 node_info["full_status"] = self.p_prox_resources.get(
-                    f"nodes/{node_name}/status")
+                    self.NODE_STATUS.format(node_name=node_name))
                 node_info["rrddata"] = self.p_prox_resources.get(
-                    f"nodes/{node_name}/rrddata")
+                    self.NODE_RRDDATA.format(node_name=node_name))
                 break
 
         return node_info
@@ -51,7 +59,7 @@ class _ProxmoxData():
     def get_guest_information(self, node_name: str, resource_type: Literal["lxc", "qemu"], vmid: str) -> dict:
         guest_info = {}
         for g in self.p_prox_resources.get(
-                f"nodes/{node_name}/{resource_type}", []):
+                self.NODE_GUEST_DATA.format(node_name=node_name, resource_type=resource_type), []):
             if g["vmid"] == int(vmid):
                 guest_info = deepcopy(g)
                 break
@@ -61,9 +69,9 @@ class _ProxmoxData():
 
         guest_info["node"] = node_name
         guest_info["status/current"] = self.p_prox_resources.get(
-            f"nodes/{node_name}/{resource_type}/{vmid}/status/current", {})
+            self.GUEST_STATUS.format(node_name=node_name, resource_type=resource_type, vmid=vmid), {})
         guest_info["rrddata"] = self.p_prox_resources.get(
-            f"nodes/{node_name}/{resource_type}/{vmid}/rrddata", {})
+            self.GUEST_RRDDATA.format(node_name=node_name, resource_type=resource_type, vmid=vmid), {})
 
         return guest_info
 
@@ -71,12 +79,11 @@ class _ProxmoxData():
         """
         Getting quests list of the given type on the proxmox
         """
-        nodes: list = self.p_prox_resources.get("nodes", [])
+        nodes: list = self.p_prox_resources.get(self.BASE_NODES, [])
         vms: list = []
         for node in nodes:
-            resources_key: str = f"nodes/{node['node']}/{resource_type}"
             vms_on_node: list = self.p_prox_resources.get(
-                resources_key, [])
+                self.NODE_GUEST_DATA.format(node_name=node["node"], resource_type=resource_type), [])
             # filter out resources which are templates
             vms_on_node = [
                 vm for vm in vms_on_node if vm.get("template", 0) != 1]
@@ -84,13 +91,13 @@ class _ProxmoxData():
             vms_on_node = [
                 {**vm,
                  "node": node["node"],
-                 "status/current": self.p_prox_resources.get(f"{resources_key}/{vm['vmid']}/status/current", {}),
-                 "rrddata": self.p_prox_resources.get(f"{resources_key}/{vm['vmid']}/rrddata", [])} for vm in vms_on_node]
+                 "status/current": self.p_prox_resources.get(self.GUEST_STATUS.format(node_name=node["node"], resource_type=resource_type, vmid=vm["vmid"]), {}),
+                 "rrddata": self.p_prox_resources.get(self.GUEST_RRDDATA.format(node_name=node["node"], resource_type=resource_type, vmid=vm["vmid"]), {})} for vm in vms_on_node]
             vms.extend(vms_on_node)
         return vms
 
     def get_cluster_tasks(self) -> list:
-        return self.p_prox_resources.get("cluster/tasks", [])
+        return self.p_prox_resources.get(self.CLUSTER_TASKS, [])
 
     def dump_resources(self) -> Path:
         """Dump all resources to file"""
