@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from textual.widgets import DataTable
+from textual.widgets import DataTable, data_table
 
 from lazyprox.data import ProxmoxData
 
@@ -112,5 +112,5 @@ class NodeTasksWidget(DataTable):
             try:
                 index = self.get_row_index(current_key)
                 self.move_cursor(row=index, column=0)
-            except KeyError:
+            except (KeyError, data_table.RowDoesNotExist):
                 pass
