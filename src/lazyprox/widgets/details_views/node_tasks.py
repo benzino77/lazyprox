@@ -9,17 +9,22 @@ TASK_DESCRIPTIONS: dict[str, str] = {
     "aptupdate": "Update package database",
     "startall": "Bulk start VMs and Containers",
     "stopall": "Bulk shutdown VMs and Containers",
+    "bulk-shutdown": "Bulk shutdown VMs and Containers",
+    "bulk-start": "Bulk start VMs and Containers",
     "vzdump": "Backup job",
     "vncproxy": "VM/CT {id} - Console",
+    "vncshell": "Shell",
     "qmstart": "VM {id} - Start",
     "qmshutdown": "VM {id} - Shutdown",
     "qmreset": "VM {id} - Reset",
     "qmreboot": "VM {id} - Reboot",
     "qmsuspend": "VM {id} - Hibernate",
+    "qmigrate": "VM {id} - Migrate",
     "vzstart": "CT {id} - Start",
     "vzshutdown": "CT {id} - Shutdown",
     "vzstop": "CT {id} - Stop",
     "vzreboot": "CT {id} - Reboot",
+    "vzmigrate": "CT {id} - Migrate",
 }
 
 
