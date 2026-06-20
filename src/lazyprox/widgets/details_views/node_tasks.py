@@ -7,6 +7,7 @@ from lazyprox.data import ProxmoxData
 
 TASK_DESCRIPTIONS: dict[str, str] = {
     "aptupdate": "Update package database",
+    "acmerenew": "Renew certificate",
     "startall": "Bulk start VMs and Containers",
     "stopall": "Bulk shutdown VMs and Containers",
     "bulk-shutdown": "Bulk shutdown VMs and Containers",
