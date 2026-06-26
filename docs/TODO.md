@@ -1,5 +1,5 @@
 - [x] Implement actions for nodes, containers and virtual machines - for now only SSH action is implemented
-- [ ] Add question dialog for actions that require user confirmation - for example "Are you sure you want to stop this container?"
+- [x] Add question dialog for actions that require user confirmation - for example "Are you sure you want to stop this container?"
 - [ ] Add other views - for example a view of tasks fro the server/cluster
   - [x] Add view for cluster tasks 
   - [ ] Add details view for selected cluster task
