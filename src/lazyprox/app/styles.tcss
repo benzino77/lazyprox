@@ -71,6 +71,36 @@ FilterScreen {
     width: 50;
 }
 
+ConfirmationScreen {
+    align: center middle;
+}
+
+#confirm_dialog {
+    width: auto;
+    height: 9;
+    border: round $primary;
+    padding: 1;
+}
+
+#confirm_question {
+    margin-bottom: 1;
+    text-align: center;
+}
+
+#confirm_buttons {
+    align: center middle;
+    width: 100%;
+}
+
+#confirm_no {
+    margin-right: 1;
+    width: auto;
+}
+
+#confirm_yes {
+    width: auto;
+}
+
 .details_left {
     width: 2fr;
 }

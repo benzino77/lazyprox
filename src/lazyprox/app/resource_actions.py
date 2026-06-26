@@ -40,6 +40,19 @@ class ResourceActions:
     def get_resource_name(self) -> str:
         return self.event.data_table.get_row(self.event.row_key)[0]
 
+    def get_confirm_message(self, action: str) -> str:
+        resource_type = self.event.data_table.table_type
+        name = self.get_resource_name()
+        action_lower = action.lower()
+
+        if resource_type == "node":
+            return f"Are you sure you want to {action_lower} node {name}?"
+
+        row = self.event.data_table.get_row(self.event.row_key)
+        vmid = row[1]
+        label = "LXC" if resource_type == "lxc" else "VM"
+        return f"Are you sure you want to {action_lower} {label} {vmid} ({name})?"
+
     def perform_action(self, selected_action: str) -> None:
         action = selected_action.lower()
         resource_type = self.event.data_table.table_type

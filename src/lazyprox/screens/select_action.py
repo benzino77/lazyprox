@@ -18,11 +18,3 @@ class ActionSelectionScreen(ModalScreen[str]):
         if event.value is not Select.BLANK and event.value is not Select.NULL:
             self.dismiss(event.value)
 
-    def on_screen_resume(self):
-        # clear the previous selection
-        action_select = self.query_one("#action_select")
-        action_select.options = [
-            ("Jeden", 0), ("Dwa", 1), ("Trzy", 2), ("Cztery", 3)]
-        action_select.value = Select.NULL
-
-        pass

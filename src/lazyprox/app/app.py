@@ -12,7 +12,7 @@ from textual.widgets import DataTable
 from .resource_actions import ResourceActions
 from lazyprox.common import Config
 from lazyprox.data import ProxmoxData
-from lazyprox.screens import WaitingScreen, ServerSelectionScreen, DashboardScreen, FilterScreen, ActionSelectionScreen
+from lazyprox.screens import WaitingScreen, ServerSelectionScreen, DashboardScreen, FilterScreen, ActionSelectionScreen, ConfirmationScreen
 from lazyprox.widgets import NodeWidget, LxcWidget, QemuWidget
 
 
@@ -251,25 +251,35 @@ class LazyProx(App):
         self.handle_update_message(qu)
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
-        # when "enter" is pressed on DataTable widget, the action screen should be displayed
+        self.run_action_flow(event)
+
+    @work()
+    async def run_action_flow(self, event: DataTable.RowSelected) -> None:
         resource_actions = ResourceActions(event)
         list_items = resource_actions.get_actions_list()
         resource_name = resource_actions.get_resource_name()
 
-        def check_action(selected_action: str | None) -> None:
-            if selected_action == "SSH":
-                with self.suspend():
-                    os.system(f"ssh {resource_name}")
-                self.app.refresh()
-            else:
-                try:
-                    resource_actions.perform_action(selected_action)
-                    self.notify(message=f"{selected_action} on {resource_name} successful", title="Action",
-                                severity="information")
-                except Exception as e:
-                    self._notify_error(str(e))
+        selected_action = await self.push_screen_wait(ActionSelectionScreen(items=list_items))
+        if selected_action is None:
+            return
 
-        self.push_screen(ActionSelectionScreen(items=list_items), check_action)
+        if selected_action == "SSH":
+            with self.suspend():
+                os.system(f"ssh {resource_name}")
+            self.app.refresh()
+            return
+
+        confirm_message = resource_actions.get_confirm_message(selected_action)
+        confirmed = await self.push_screen_wait(ConfirmationScreen(question=confirm_message))
+        if not confirmed:
+            return
+
+        try:
+            resource_actions.perform_action(selected_action)
+            self.notify(message=f"{selected_action} on {resource_name} successful", title="Action",
+                        severity="information")
+        except Exception as e:
+            self._notify_error(str(e))
 
     @work()
     async def action_change_server(self) -> None:
