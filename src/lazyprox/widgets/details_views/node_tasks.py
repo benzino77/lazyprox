@@ -16,6 +16,7 @@ TASK_DESCRIPTIONS: dict[str, str] = {
     "vncproxy": "VM/CT {id} - Console",
     "vncshell": "Shell",
     "qmstart": "VM {id} - Start",
+    "qmstop": "VM {id} - Stop",
     "qmshutdown": "VM {id} - Shutdown",
     "qmreset": "VM {id} - Reset",
     "qmreboot": "VM {id} - Reboot",
