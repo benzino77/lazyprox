@@ -5,6 +5,8 @@ from typing import List, Optional
 from pydantic import BaseModel
 from pathlib import Path
 
+from .singleton import singleton
+
 
 class ProxmoxServerConfig(BaseModel):
     name: str
@@ -31,6 +33,7 @@ class ConfigDict(BaseModel):
     application: Optional[ApplicationConfig] = ApplicationConfig()
 
 
+@singleton
 class _Config():
     configuration: ConfigDict = None
     server_index: int = 0

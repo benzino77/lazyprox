@@ -5,9 +5,10 @@ from copy import deepcopy
 
 from proxmoxer import ProxmoxAPI
 
-from lazyprox.common import Config
+from lazyprox.common import Config, singleton
 
 
+@singleton
 class _ProxmoxData():
     BASE_NODES: str = "nodes"
     NODE_STATUS: str = "nodes/{node_name}/status"
