@@ -3,8 +3,8 @@ import sys
 
 from pydantic import ValidationError
 
-from lazyprox.common import Config
 from lazyprox.app import LazyProx
+from lazyprox.common import Config
 
 
 def main() -> None:

@@ -1,6 +1,6 @@
+from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import LoadingIndicator
-from textual.app import ComposeResult
 
 
 class WaitingScreen(Screen):

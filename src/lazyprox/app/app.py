@@ -1,19 +1,27 @@
 import os
-from typing import Literal
 from itertools import product
+from typing import Literal
 
-from textual.app import App
-from textual.message import Message
-from textual.binding import Binding
-from textual.timer import Timer
 from textual import work
+from textual.app import App
+from textual.binding import Binding
+from textual.message import Message
+from textual.timer import Timer
 from textual.widgets import DataTable
 
-from .resource_actions import ResourceActions
 from lazyprox.common import Config
 from lazyprox.data import ProxmoxData
-from lazyprox.screens import WaitingScreen, ServerSelectionScreen, DashboardScreen, FilterScreen, ActionSelectionScreen, ConfirmationScreen
-from lazyprox.widgets import NodeWidget, LxcWidget, QemuWidget
+from lazyprox.screens import (
+    ActionSelectionScreen,
+    ConfirmationScreen,
+    DashboardScreen,
+    FilterScreen,
+    ServerSelectionScreen,
+    WaitingScreen,
+)
+from lazyprox.widgets import LxcWidget, NodeWidget, QemuWidget
+
+from .resource_actions import ResourceActions
 
 
 class LazyProx(App):

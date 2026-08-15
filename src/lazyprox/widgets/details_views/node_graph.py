@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
-from textual.containers import HorizontalGroup
 from textual.app import ComposeResult
+from textual.containers import HorizontalGroup
 
 from lazyprox.data import ProxmoxData
 from lazyprox.widgets.details_views import BaseGraphView, GraphWidget

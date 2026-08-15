@@ -4,7 +4,6 @@ from textual.widgets import DataTable, data_table
 
 from lazyprox.data import ProxmoxData
 
-
 TASK_DESCRIPTIONS: dict[str, str] = {
     "aptupdate": "Update package database",
     "acmerenew": "Renew certificate",

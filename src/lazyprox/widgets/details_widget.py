@@ -3,7 +3,15 @@ from typing import Literal
 from textual.app import ComposeResult
 from textual.widgets import ContentSwitcher
 
-from lazyprox.widgets.details_views import NodeSummaryWidget, NodeGraphWidget, LXCSummaryWidget, LXCGraphWidget, QemuSummaryWidget, QemuGraphWidget, NodeTasksWidget
+from lazyprox.widgets.details_views import (
+    LXCGraphWidget,
+    LXCSummaryWidget,
+    NodeGraphWidget,
+    NodeSummaryWidget,
+    NodeTasksWidget,
+    QemuGraphWidget,
+    QemuSummaryWidget,
+)
 
 
 class DetailsWidget(ContentSwitcher):

@@ -1,9 +1,9 @@
 from textual.app import ComposeResult
-from textual.containers import VerticalGroup, HorizontalGroup
-from textual.widgets import Footer
+from textual.containers import HorizontalGroup, VerticalGroup
 from textual.screen import Screen
+from textual.widgets import Footer
 
-from lazyprox.widgets import NodeWidget, LxcWidget, QemuWidget, DetailsWidget
+from lazyprox.widgets import DetailsWidget, LxcWidget, NodeWidget, QemuWidget
 
 
 class DashboardScreen(Screen):

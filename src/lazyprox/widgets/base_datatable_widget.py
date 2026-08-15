@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, Literal, TypedDict, Tuple, Dict
+from typing import Dict, Iterable, Literal, Tuple, TypedDict
 
 from rich.text import Text
 from textual.render import measure

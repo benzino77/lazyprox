@@ -1,9 +1,9 @@
 import os
 import tomllib as toml
+from pathlib import Path
 from typing import List, Optional
 
 from pydantic import BaseModel
-from pathlib import Path
 
 from .singleton import singleton
 

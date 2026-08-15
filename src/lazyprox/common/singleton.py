@@ -2,9 +2,9 @@
 Thread-safe singleton decorator for Python classes.
 """
 
-from functools import wraps
 import threading
-from typing import TypeVar, Type
+from functools import wraps
+from typing import Type, TypeVar
 
 T = TypeVar('T')
 

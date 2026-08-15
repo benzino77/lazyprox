@@ -1,7 +1,7 @@
 import json
+from copy import deepcopy
 from pathlib import Path
 from typing import Literal
-from copy import deepcopy
 
 from proxmoxer import ProxmoxAPI
 
