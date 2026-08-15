@@ -1,7 +1,7 @@
 [project]
 name = "lazyprox"
 license = "MIT"
-version = "0.4.1"
+version = "0.5.0"
 description = "Proxmox TUI"
 keywords = [ "proxmox", "terminal", "TUI", "client", "console" ]
 readme = "README.md"
@@ -13,6 +13,7 @@ dependencies = [
     "proxmoxer>=2.3.0",
     "pydantic>=2.13.4",
     "requests>=2.34.2",
+    "rich>=15.0.0",
     "textual>=8.2.6",
     "textual-plotext>=1.0.1",
 ]

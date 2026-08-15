@@ -1,9 +1,15 @@
 import re
 from typing import Iterable, Literal, TypedDict, Tuple, Dict
 
+from rich.text import Text
+from textual.render import measure
 from textual.widgets import DataTable
 
 from lazyprox.common import set_focus_border
+
+# Nerd Font arrows (nf-oct-arrow_up / nf-oct-arrow_down)
+SORT_ARROW_UP = chr(0xF431)
+SORT_ARROW_DOWN = chr(0xF433)
 
 
 class BaseDataTableWidget(DataTable):
@@ -81,6 +87,29 @@ class BaseDataTableWidget(DataTable):
         self.remove_border_indicator(indicator)
         self.border_title = f"{self.table_border_title} {indicator}"
 
+    def _update_sort_indicators(self) -> None:
+        sort_column = self.sort_by_column
+        for col in self.nodes_columns:
+            name = col["name"]
+            column = self.columns.get(name)
+            if column is None:
+                continue
+            if sort_column and name == sort_column:
+                arrow = (
+                    SORT_ARROW_DOWN
+                    if self.column_sort_order.get(sort_column, False)
+                    else SORT_ARROW_UP
+                )
+                label = Text(f"{name}{arrow}", style="italic")
+            else:
+                label = Text(name)
+            column.label = label
+            label_width = measure(self.app.console, label, 1)
+            if label_width > column.content_width:
+                column.content_width = label_width
+        self._require_update_dimensions = True
+        self.refresh()
+
     def update_table_data(self) -> None:
         # let's filter data out based on the filter
         filtered_data = []
@@ -138,6 +167,7 @@ class BaseDataTableWidget(DataTable):
         else:
             self.sort(column, reverse=self.column_sort_order[column])
         self.sort_by_column = column
+        self._update_sort_indicators()
 
         if is_selected and has_focus:
             # selected an index of a row which key is stored in the row_index_position element of the selected row
@@ -149,7 +179,7 @@ class BaseDataTableWidget(DataTable):
 
     def on_mount(self) -> None:
         for c in self.nodes_columns:
-            self.add_column(c["name"], key=c["name"])
+            self.add_column(Text(c["name"]), key=c["name"])
             self.column_sort_order[c["name"]] = False
         self.border_title = self.table_border_title
         self.show_header = True

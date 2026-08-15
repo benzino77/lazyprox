@@ -1,9 +1,9 @@
 - [x] Implement actions for nodes, containers and virtual machines - for now only SSH action is implemented
 - [x] Add question dialog for actions that require user confirmation - for example "Are you sure you want to stop this container?"
-- [ ] Add other views - for example a view of tasks fro the server/cluster
+- [ ] Add other views - for example a view of tasks from the server/cluster
   - [x] Add view for cluster tasks 
   - [ ] Add details view for selected cluster task
-- [ ] Add sorting indicators to the table headers: an arrow pointing up for ascending order and an arrow pointing down for descending order next to the column name that is currently being sorted.
+- [x] Add sorting indicators to the table headers: an arrow pointing up for ascending order and an arrow pointing down for descending order next to the column name that is currently being sorted.
 - [ ] Check possibility to add "bulk actions"
 - [ ] Check possibility to add action to migrate container/VM to another node if the cluster has more than one node
 - [ ] Upload to PyPI and add installation instructions for pip
