@@ -14,9 +14,9 @@ class NodeSummaryWidget(BaseSummaryView):
         with VerticalGroup(classes="details_left"):
             yield Label("Uptime:")
             yield Label("Status:")
-            yield Label(f"CPUs:", id="node_cpu_label")
+            yield Label("CPUs:", id="node_cpu_label")
             yield Label("Load average:")
-            yield Label(f"Memory:", id="node_memory_label")
+            yield Label("Memory:", id="node_memory_label")
             yield Label("HD Space:")
             yield Label("IO delay:")
             yield Label("KSM sharing:")
