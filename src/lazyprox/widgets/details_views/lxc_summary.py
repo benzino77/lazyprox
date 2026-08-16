@@ -4,7 +4,8 @@ from textual.widgets import Label, ProgressBar
 
 from lazyprox.common import calculate_uptime, format_bytes
 from lazyprox.data import ProxmoxData
-from lazyprox.widgets.details_views import BaseSummaryView
+
+from .summary_base import BaseSummaryView
 
 
 class LXCSummaryWidget(BaseSummaryView):

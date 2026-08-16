@@ -4,7 +4,9 @@ from textual.app import ComposeResult
 from textual.containers import HorizontalGroup
 
 from lazyprox.data import ProxmoxData
-from lazyprox.widgets.details_views import BaseGraphView, GraphWidget
+
+from .graph_base import BaseGraphView
+from .graph_widget import GraphWidget
 
 
 class QemuGraphWidget(BaseGraphView):
