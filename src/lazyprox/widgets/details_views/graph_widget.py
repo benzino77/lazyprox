@@ -8,13 +8,13 @@ class GraphWidget(PlotextPlot):
                  series_1_label: str,
                  series_2_label: str,
                  series_x1: list = [],
-                 series_x1_limit: int | float | None = None,
+                 series_x1_limit: float | None = None,
                  series_y1: list = [],
-                 series_y1_limit: float | int | None = None,
+                 series_y1_limit: float | None = None,
                  series_x2: list = [],
-                 series_x2_limit: int | float | None = None,
+                 series_x2_limit: float | None = None,
                  series_y2: list = [],
-                 series_y2_limit: float | int | None = None,
+                 series_y2_limit: float | None = None,
                  *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.graph_title = graph_title
@@ -34,7 +34,7 @@ class GraphWidget(PlotextPlot):
         self.plt.xlabel(data_x_label)
         self.plt.ylabel(data_y_label)
 
-    def set_data(self, series_x1: list, series_x1_limit: int | float | None, series_y1: list, series_y1_limit: float | int | None, series_x2: list = [], series_x2_limit: int | float | None = None, series_y2: list = [], series_y2_limit: float | int | None = None) -> None:
+    def set_data(self, series_x1: list, series_x1_limit: float | None, series_y1: list, series_y1_limit: float | None, series_x2: list = [], series_x2_limit: float | None = None, series_y2: list = [], series_y2_limit: float | None = None) -> None:
         self.series_x1 = series_x1
         self.series_x1_limit = series_x1_limit
         self.series_y1 = series_y1
