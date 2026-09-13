@@ -56,7 +56,7 @@ class BaseDataTableWidget(DataTable):
     def _call_update_details(self) -> None:
         try:
             details_widget = self.screen.query_one(self.details_widget)
-        except Exception as e:
+        except Exception:
             return
         if (self.cursor_row >= 0 and len(self.rows) > 0):
             details_widget.update_details_data(
