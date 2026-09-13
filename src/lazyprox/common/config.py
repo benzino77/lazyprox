@@ -1,7 +1,6 @@
 import os
 import tomllib as toml
 from pathlib import Path
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -15,22 +14,22 @@ class ProxmoxServerConfig(BaseModel):
     realm: str
     token_name: str
     token_value: str
-    verify_ssl: Optional[bool] = True  # default to True
+    verify_ssl: bool | None = True  # default to True
 
 
 class ApplicationConfig(BaseModel):
-    refresh_interval: Optional[float] = 10.0
-    refresh_interval_rrddata: Optional[float] = 30.0
-    refresh_interval_tasks: Optional[float] = 15.0
-    debug_dump_dest: Optional[str] = "lazyprox-dump.json"
-    rrddata_timeframe: Optional[str] = "hour"  # timeframe for rrd data
-    rrddata_cf: Optional[str] = "AVERAGE"  # consolidation function
+    refresh_interval: float | None = 10.0
+    refresh_interval_rrddata: float | None = 30.0
+    refresh_interval_tasks: float | None = 15.0
+    debug_dump_dest: str | None = "lazyprox-dump.json"
+    rrddata_timeframe: str | None = "hour"  # timeframe for rrd data
+    rrddata_cf: str | None = "AVERAGE"  # consolidation function
 
 
 class ConfigDict(BaseModel):
     server: list[ProxmoxServerConfig]
     # use default values if missing
-    application: Optional[ApplicationConfig] = ApplicationConfig()
+    application: ApplicationConfig | None = ApplicationConfig()
 
 
 @singleton
