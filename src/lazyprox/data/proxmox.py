@@ -9,7 +9,7 @@ from lazyprox.common import Config, singleton
 
 
 @singleton
-class _ProxmoxData():
+class _ProxmoxData:
     BASE_NODES: str = "nodes"
     NODE_STATUS: str = "nodes/{node_name}/status"
     NODE_RRDDATA: str = "nodes/{node_name}/rrddata"

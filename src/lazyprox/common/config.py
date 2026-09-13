@@ -34,7 +34,7 @@ class ConfigDict(BaseModel):
 
 
 @singleton
-class _Config():
+class _Config:
     configuration: ConfigDict = None
     server_index: int = 0
 
