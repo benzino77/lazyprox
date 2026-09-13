@@ -1,5 +1,6 @@
 import re
-from typing import Iterable, Literal, TypedDict
+from typing import Literal, TypedDict
+from collections.abc import Iterable
 
 from rich.text import Text
 from textual.render import measure
