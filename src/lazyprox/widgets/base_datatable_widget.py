@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Iterable, Literal, Tuple, TypedDict
+from typing import Iterable, Literal, TypedDict
 
 from rich.text import Text
 from textual.render import measure
@@ -25,10 +25,10 @@ class BaseDataTableWidget(DataTable):
         sort_key_show: bool
         type: str
 
-    nodes_columns: Tuple[ColumnDict, ...] = ()
+    nodes_columns: tuple[ColumnDict, ...] = ()
 
     # this stores boolean values for each column if it is sorted in ascending or descending order
-    column_sort_order: Dict[str, bool] = {}
+    column_sort_order: dict[str, bool] = {}
     # this is used to store the text which is used to filter the data in the table
     # this can also be a regex pattern
     filter_text: str = ""

@@ -1,7 +1,7 @@
 import os
 import tomllib as toml
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -28,7 +28,7 @@ class ApplicationConfig(BaseModel):
 
 
 class ConfigDict(BaseModel):
-    server: List[ProxmoxServerConfig]
+    server: list[ProxmoxServerConfig]
     # use default values if missing
     application: Optional[ApplicationConfig] = ApplicationConfig()
 
