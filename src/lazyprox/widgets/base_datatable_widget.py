@@ -80,7 +80,6 @@ class BaseDataTableWidget(DataTable):
         Should return iterable of rows which will be displayed in the table.
         Each row is a tuple of values which will be displayed in the columns.
         """
-        pass
 
     def rotate_details_mode(self) -> None:
         """
@@ -115,8 +114,7 @@ class BaseDataTableWidget(DataTable):
                 label = Text(name)
             column.label = label
             label_width = measure(self.app.console, label, 1)
-            if label_width > column.content_width:
-                column.content_width = label_width
+            column.content_width = max(column.content_width, label_width)
         self._require_update_dimensions = True
         self.refresh()
 
