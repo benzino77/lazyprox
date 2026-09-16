@@ -1,4 +1,4 @@
-import os
+import subprocess
 from collections.abc import Callable
 from itertools import product
 from typing import Any, ClassVar, Literal
@@ -276,7 +276,9 @@ class LazyProx(App):
 
         if selected_action == "SSH":
             with self.suspend():
-                os.system(f"ssh {resource_name}")
+                # ssh has to block on purpose: the app is suspended and the
+                # terminal is handed over to the ssh session until the user exits.
+                subprocess.run(["ssh", resource_name], check=False)  # noqa: ASYNC221
             self.app.refresh()
             return
 
