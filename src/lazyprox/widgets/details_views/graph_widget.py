@@ -7,41 +7,41 @@ class GraphWidget(PlotextPlot):
                  data_y_label: str,
                  series_1_label: str,
                  series_2_label: str,
-                 series_x1: list = [],
+                 series_x1: list | None = None,
                  series_x1_limit: float | None = None,
-                 series_y1: list = [],
+                 series_y1: list | None = None,
                  series_y1_limit: float | None = None,
-                 series_x2: list = [],
+                 series_x2: list | None = None,
                  series_x2_limit: float | None = None,
-                 series_y2: list = [],
+                 series_y2: list | None = None,
                  series_y2_limit: float | None = None,
                  *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.graph_title = graph_title
         self.data_x_label = data_x_label
-        self.series_x1 = series_x1
+        self.series_x1 = series_x1 or []
         self.series_x1_limit = series_x1_limit
         self.series_1_label = series_1_label
         self.data_y_label = data_y_label
-        self.series_y1 = series_y1
+        self.series_y1 = series_y1 or []
         self.series_y1_limit = series_y1_limit
-        self.series_x2 = series_x2
+        self.series_x2 = series_x2 or []
         self.series_x2_limit = series_x2_limit
         self.series_2_label = series_2_label
-        self.series_y2 = series_y2
+        self.series_y2 = series_y2 or []
         self.series_y2_limit = series_y2_limit
         self.plt.title(graph_title)
         self.plt.xlabel(data_x_label)
         self.plt.ylabel(data_y_label)
 
-    def set_data(self, series_x1: list, series_x1_limit: float | None, series_y1: list, series_y1_limit: float | None, series_x2: list = [], series_x2_limit: float | None = None, series_y2: list = [], series_y2_limit: float | None = None) -> None:
+    def set_data(self, series_x1: list, series_x1_limit: float | None, series_y1: list, series_y1_limit: float | None, series_x2: list | None = None, series_x2_limit: float | None = None, series_y2: list | None = None, series_y2_limit: float | None = None) -> None:
         self.series_x1 = series_x1
         self.series_x1_limit = series_x1_limit
         self.series_y1 = series_y1
         self.series_y1_limit = series_y1_limit
-        self.series_x2 = series_x2
+        self.series_x2 = series_x2 or []
         self.series_x2_limit = series_x2_limit
-        self.series_y2 = series_y2
+        self.series_y2 = series_y2 or []
         self.series_y2_limit = series_y2_limit
         self.render_graph()
 

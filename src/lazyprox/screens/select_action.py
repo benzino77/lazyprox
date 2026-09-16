@@ -6,9 +6,9 @@ from textual.widgets import Select
 class ActionSelectionScreen(ModalScreen[str]):
     BINDINGS = [("escape", "app.pop_screen", "Back to dashboard")]
 
-    def __init__(self, items: list[str] = []):
+    def __init__(self, items: list[str] | None = None):
         super().__init__()
-        self.items = items
+        self.items = items or []
 
     def compose(self) -> ComposeResult:
         options = [(item, item) for item in self.items]
