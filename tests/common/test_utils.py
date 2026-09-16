@@ -2,7 +2,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from lazyprox.common.utils import calculate_uptime, format_bytes, set_focus_border
+from lazyprox.common.utils import (
+    calculate_uptime,
+    format_bytes,
+    format_timestamp,
+    set_focus_border,
+)
 
 
 @pytest.mark.parametrize(
@@ -37,6 +42,11 @@ def test_calculate_uptime(seconds, expected):
 )
 def test_format_bytes(bytes_value, expected):
     assert format_bytes(bytes_value) == expected
+
+
+def test_format_timestamp():
+    assert format_timestamp(0) == "01/01/1970 00:00:00 UTC"
+    assert format_timestamp(1700000000) == "14/11/2023 22:13:20 UTC"
 
 
 def test_set_focus_border_removes_unfocused_and_adds_focused():

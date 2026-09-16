@@ -1,8 +1,7 @@
-from datetime import datetime, timezone
-
 from textual.app import ComposeResult
 from textual.containers import HorizontalGroup
 
+from lazyprox.common import format_timestamp
 from lazyprox.data import ProxmoxData
 
 from .graph_base import BaseGraphView
@@ -69,8 +68,7 @@ class NodeGraphWidget(BaseGraphView):
                 netout_data.append(entry["netout"]/1024/1024)
                 # pass the string with the time zone, then when output_form (of X axis) is used,
                 # it will be converted to the local time zone
-                time_data.append(datetime.fromtimestamp(
-                    entry["time"], tz=timezone.utc).strftime("%d/%m/%Y %H:%M:%S %Z"))
+                time_data.append(format_timestamp(entry["time"]))
 
         node_cpu_io_graph = self.query_one("#node_cpu_io_graph", GraphWidget)
         node_memory_graph = self.query_one("#node_memory_graph", GraphWidget)

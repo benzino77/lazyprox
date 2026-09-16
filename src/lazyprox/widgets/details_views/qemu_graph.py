@@ -1,8 +1,7 @@
-from datetime import datetime, timezone
-
 from textual.app import ComposeResult
 from textual.containers import HorizontalGroup
 
+from lazyprox.common import format_timestamp
 from lazyprox.data import ProxmoxData
 
 from .graph_base import BaseGraphView
@@ -70,8 +69,7 @@ class QemuGraphWidget(BaseGraphView):
                 netout_data.append(entry["netout"])
                 diskread_data.append(entry["diskread"])
                 diskwrite_data.append(entry["diskwrite"])
-                time_data.append(datetime.fromtimestamp(
-                    entry["time"], tz=timezone.utc).strftime("%d/%m/%Y %H:%M:%S %Z"))
+                time_data.append(format_timestamp(entry["time"]))
 
         qemu_cpu_graph = self.query_one("#qemu_cpu_graph", GraphWidget)
         qemu_memory_graph = self.query_one("#qemu_memory_graph", GraphWidget)
