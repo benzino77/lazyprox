@@ -20,7 +20,7 @@ def main() -> None:
     except FileNotFoundError:
         print("Cannot find lazyprox config file.", file=sys.stderr)
         sys.exit(1)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(f"Something went wrong: {e}", file=sys.stderr)
         sys.exit(2)
 

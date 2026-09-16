@@ -5,6 +5,7 @@ from typing import Literal
 from textual import work
 from textual.app import App
 from textual.binding import Binding
+from textual.css.query import NoMatches
 from textual.message import Message
 from textual.timer import Timer
 from textual.widgets import DataTable
@@ -81,7 +82,7 @@ class LazyProx(App):
         try:
             widget = self.screen.query_one(widget_cls)
             widget.update_table_data()
-        except Exception:
+        except NoMatches:
             return
 
     def stop_timers(self) -> None:
@@ -126,7 +127,7 @@ class LazyProx(App):
                 self.refresh_task_nodes_data()
             msg = self.NodesUpdated(
                 {"success": True, "text": "Nodes data updated successfully"})
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             msg = self.NodesUpdated({"success": False, "text": str(e)})
         finally:
             self.post_message(msg)
@@ -159,7 +160,7 @@ class LazyProx(App):
                 {"success": True,
                     "text": f"{guest_type.capitalize()} data updated successfully"}
             )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             msg = msg_cls({"success": False, "text": str(e)})
         finally:
             self.post_message(msg)
@@ -178,7 +179,7 @@ class LazyProx(App):
             self.refresh_task_nodes_data()
             msg = self.ProxmoxInitialized(
                 {"success": True, "text": "Proxmox initialized successfully"})
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             msg = self.ProxmoxInitialized({"success": False, "text": str(e)})
         finally:
             self.post_message(msg)
@@ -246,7 +247,7 @@ class LazyProx(App):
                 # set focus on the NodeWidget after Proxmox is initialized
                 self.screen.set_focus(
                     widget) if widget_type is NodeWidget else None
-            except Exception:
+            except NoMatches:
                 continue
 
     def on_lazy_prox_nodes_updated(self, nu: NodesUpdated) -> None:
@@ -286,7 +287,7 @@ class LazyProx(App):
             resource_actions.perform_action(selected_action)
             self.notify(message=f"{selected_action} on {resource_name} successful", title="Action",
                         severity="information")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             self._notify_error(str(e))
 
     @work()
@@ -318,7 +319,7 @@ class LazyProx(App):
             path = ProxmoxData.dump_resources()
             self.notify(message=str(path), title="Dump file saved",
                         severity="information")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             self._notify_error(str(e))
 
     def action_quit(self) -> None:

@@ -3,6 +3,7 @@ from typing import Literal, TypedDict
 from collections.abc import Iterable
 
 from rich.text import Text
+from textual.css.query import NoMatches
 from textual.render import measure
 from textual.widgets import DataTable
 
@@ -56,7 +57,7 @@ class BaseDataTableWidget(DataTable):
     def _call_update_details(self) -> None:
         try:
             details_widget = self.screen.query_one(self.details_widget)
-        except Exception:
+        except NoMatches:
             return
         if (self.cursor_row >= 0 and len(self.rows) > 0):
             details_widget.update_details_data(
