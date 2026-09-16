@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from textual.widgets import DataTable, data_table
 
@@ -79,9 +79,9 @@ class NodeTasksWidget(DataTable):
 
         for task in tasks:
             start_str = datetime.fromtimestamp(
-                task["starttime"]).strftime("%b %d %H:%M:%S")
+                task["starttime"], tz=timezone.utc).astimezone().strftime("%b %d %H:%M:%S")
             endtime = task.get("endtime", 0)
-            end_str = datetime.fromtimestamp(endtime).strftime(
+            end_str = datetime.fromtimestamp(endtime, tz=timezone.utc).astimezone().strftime(
                 "%b %d %H:%M:%S") if endtime else ""
             desc_template = TASK_DESCRIPTIONS.get(task["type"])
             if desc_template:

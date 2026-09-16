@@ -1,6 +1,6 @@
 import re
-from typing import Literal, TypedDict
 from collections.abc import Iterable
+from typing import Literal, TypedDict
 
 from rich.text import Text
 from textual.css.query import NoMatches
