@@ -33,7 +33,7 @@ class QemuWidget(BaseDataTableWidget):
     table_type = "qemu"
     table_border_title = "Virtual machines"
     row_index_position = 0
-    details_mode = ["summary", "graphs"]
+    details_modes: tuple[str, ...] = ("summary", "graphs")
     details_widget = "DetailsWidget"
 
     def build_row(self):

@@ -29,7 +29,7 @@ class NodeWidget(BaseDataTableWidget):
     table_type = "node"
     table_border_title = "Nodes"
     row_index_position = 0
-    details_mode = ["summary", "graphs", "tasks"]
+    details_modes: tuple[str, ...] = ("summary", "graphs", "tasks")
     details_widget = "DetailsWidget"
 
     def build_row(self):

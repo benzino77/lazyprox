@@ -34,7 +34,7 @@ class LxcWidget(BaseDataTableWidget):
     table_type = "lxc"
     table_border_title = "LXC containers"
     row_index_position = 0
-    details_mode = ["summary", "graphs"]
+    details_modes: tuple[str, ...] = ("summary", "graphs")
     details_widget = "DetailsWidget"
 
     def build_row(self):

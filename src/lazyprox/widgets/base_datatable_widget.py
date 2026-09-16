@@ -30,7 +30,8 @@ class BaseDataTableWidget(DataTable):
     nodes_columns: tuple[ColumnDict, ...] = ()
 
     # this stores boolean values for each column if it is sorted in ascending or descending order
-    column_sort_order: dict[str, bool] = {}
+    # it is initialized per instance in __init__
+    column_sort_order: dict[str, bool]
     # this is used to store the text which is used to filter the data in the table
     # this can also be a regex pattern
     filter_text: str = ""
@@ -43,9 +44,11 @@ class BaseDataTableWidget(DataTable):
     table_type: Literal["node", "lxc", "qemu"] = ""
     # title of the border of the table
     table_border_title: str = ""
-    # details panel mode, it is gonna be a rotational list of modes
+    # details panel modes, it is gonna be a rotational list of modes
     # first element is the currently displayed mode
-    details_mode: list[str] = []
+    # this class-level template is an immutable tuple, so it is safe to share between instances and cannot be mutated by accident.
+    # each instance gets its own mutable copy (details_mode) in __init__, since rotating modes mutates the order.
+    details_modes: tuple[str, ...] = ()
 
     # row_index_position variable is used to store the position of the column in the table
     # which holds the unique index of the row
@@ -53,6 +56,11 @@ class BaseDataTableWidget(DataTable):
     # the row for lxc looks like: ["lxc_name", 100, "running", "50%", "50%", "node_name"] and the vmid is an index for the row - so it is index 1
     # the row for vm looks like: ["vm_name", 100, "running", "50%", "50%", "node_name"] and the vmid is an index for the row - so it is index 1
     row_index_position: int = 0
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.column_sort_order = {}
+        self.details_mode = list(self.details_modes)
 
     def _call_update_details(self) -> None:
         try:
