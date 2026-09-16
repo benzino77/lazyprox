@@ -1,12 +1,14 @@
 import os
+from collections.abc import Callable
 from itertools import product
-from typing import Literal
+from typing import Any, ClassVar, Literal
 
 from textual import work
 from textual.app import App
-from textual.binding import Binding
+from textual.binding import Binding, BindingType
 from textual.css.query import NoMatches
 from textual.message import Message
+from textual.screen import Screen
 from textual.timer import Timer
 from textual.widgets import DataTable
 
@@ -26,7 +28,7 @@ from .resource_actions import ResourceActions
 
 
 class LazyProx(App):
-    BINDINGS = [
+    BINDINGS: ClassVar[list[BindingType]] = [
         Binding("D", "dump_debug", "Dump debug", show=False),
         ("f", "filter", "Filter"),
         ("s", "change_server", "Change server"),
@@ -34,9 +36,9 @@ class LazyProx(App):
     ]
 
     CSS_PATH = "styles.tcss"
-    SCREENS = {"select_server": ServerSelectionScreen,
-               "waiting": WaitingScreen,
-               "dashboard": DashboardScreen}
+    SCREENS: ClassVar[dict[str, Callable[[], Screen[Any]]]] = {"select_server": ServerSelectionScreen,
+                                                               "waiting": WaitingScreen,
+                                                               "dashboard": DashboardScreen}
 
     class _AppMessage(Message):
         def __init__(self, msg: dict | None = None):

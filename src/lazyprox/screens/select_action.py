@@ -1,10 +1,13 @@
+from typing import ClassVar
+
 from textual.app import ComposeResult
+from textual.binding import BindingType
 from textual.screen import ModalScreen
 from textual.widgets import Select
 
 
 class ActionSelectionScreen(ModalScreen[str]):
-    BINDINGS = [("escape", "app.pop_screen", "Back to dashboard")]
+    BINDINGS: ClassVar[list[BindingType]] = [("escape", "app.pop_screen", "Back to dashboard")]
 
     def __init__(self, items: list[str] | None = None):
         super().__init__()

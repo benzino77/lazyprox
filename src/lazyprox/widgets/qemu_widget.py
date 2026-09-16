@@ -1,4 +1,6 @@
-from textual.binding import Binding
+from typing import ClassVar
+
+from textual.binding import Binding, BindingType
 
 from lazyprox.data import ProxmoxData
 from lazyprox.widgets import BaseDataTableWidget
@@ -19,7 +21,7 @@ class QemuWidget(BaseDataTableWidget):
         {"name": "Node", "sort_key": "O",
             "sort_description": "Sort by node", "sort_action": "sort('Node')", "sort_key_show": False, "type": "string"},
     )
-    BINDINGS = [*[Binding(key=column["sort_key"], action=column["sort_action"], description=column["sort_description"], show=column["sort_key_show"]) for column in nodes_columns],
+    BINDINGS: ClassVar[list[BindingType]] = [*[Binding(key=column["sort_key"], action=column["sort_action"], description=column["sort_description"], show=column["sort_key_show"]) for column in nodes_columns],
                 Binding(key="ctrl+s", action="sort_order()",
                         description="Sorting order", show=False),
                 Binding(key="d", action="change_view()",
