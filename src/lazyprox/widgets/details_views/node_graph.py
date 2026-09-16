@@ -17,7 +17,7 @@ class NodeGraphWidget(BaseGraphView):
                 data_y_label="%",
                 series_1_label="CPU",
                 series_2_label="IOd",
-                id="node_cpu_io_graph"
+                id="node_cpu_io_graph",
             )
             yield GraphWidget(
                 graph_title="Memory usage",
@@ -25,7 +25,8 @@ class NodeGraphWidget(BaseGraphView):
                 data_y_label="GiB",
                 series_1_label="Mem",
                 series_2_label="",
-                id="node_memory_graph")
+                id="node_memory_graph",
+            )
 
         with HorizontalGroup(classes="graphs_row"):
             yield GraphWidget(
@@ -34,7 +35,8 @@ class NodeGraphWidget(BaseGraphView):
                 data_y_label="",
                 series_1_label="Load",
                 series_2_label="",
-                id="node_load_graph")
+                id="node_load_graph",
+            )
 
             yield GraphWidget(
                 graph_title="Network traffic",
@@ -42,9 +44,10 @@ class NodeGraphWidget(BaseGraphView):
                 data_y_label="MiB",
                 series_1_label="NetIN",
                 series_2_label="NetOUT",
-                id="node_network_graph")
+                id="node_network_graph",
+            )
 
-    def update_data(self,  data: list[str] | None) -> None:
+    def update_data(self, data: list[str] | None) -> None:
         if not data:
             self.clear_data()
             return
@@ -54,18 +57,27 @@ class NodeGraphWidget(BaseGraphView):
         if not rrddata:
             return
 
-        memused_data, cpuused_data, loadaverage_data, iowait_data, netin_data, netout_data, time_data = [
-        ], [], [], [], [], [], []
+        memused_data, cpuused_data, loadaverage_data, iowait_data, netin_data, netout_data, time_data = (
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        )
         mem_total = 0
         for entry in rrddata:
-            if all(key in entry for key in ["memused", "memtotal", "cpu", "time", "loadavg", "iowait", "netin", "netout"]):
-                memused_data.append(round(entry["memused"]/1024/1024/1024))
+            if all(
+                key in entry for key in ["memused", "memtotal", "cpu", "time", "loadavg", "iowait", "netin", "netout"]
+            ):
+                memused_data.append(round(entry["memused"] / 1024 / 1024 / 1024))
                 mem_total = entry["memtotal"]
                 cpuused_data.append(entry["cpu"] * 100)
                 loadaverage_data.append(entry["loadavg"])
                 iowait_data.append(entry["iowait"] * 100)
-                netin_data.append(entry["netin"]/1024/1024)
-                netout_data.append(entry["netout"]/1024/1024)
+                netin_data.append(entry["netin"] / 1024 / 1024)
+                netout_data.append(entry["netout"] / 1024 / 1024)
                 # pass the string with the time zone, then when output_form (of X axis) is used,
                 # it will be converted to the local time zone
                 time_data.append(format_timestamp(entry["time"]))
@@ -89,23 +101,37 @@ class NodeGraphWidget(BaseGraphView):
         max_net = max(net_data) or 1
 
         node_cpu_io_graph.set_data(
-            series_x1=time_data, series_x1_limit=time_data[-1],
-            series_y1=cpuused_data, series_y1_limit=max_cpu_io,
-            series_x2=time_data, series_x2_limit=time_data[-1],
-            series_y2=iowait_data, series_y2_limit=max_cpu_io,
+            series_x1=time_data,
+            series_x1_limit=time_data[-1],
+            series_y1=cpuused_data,
+            series_y1_limit=max_cpu_io,
+            series_x2=time_data,
+            series_x2_limit=time_data[-1],
+            series_y2=iowait_data,
+            series_y2_limit=max_cpu_io,
         )
 
         node_memory_graph.set_data(
-            series_x1=time_data, series_x1_limit=time_data[-1],
-            series_y1=memused_data, series_y1_limit=mem_total/1024/1024/1024)
+            series_x1=time_data,
+            series_x1_limit=time_data[-1],
+            series_y1=memused_data,
+            series_y1_limit=mem_total / 1024 / 1024 / 1024,
+        )
 
         node_load_graph.set_data(
-            series_x1=time_data, series_x1_limit=time_data[-1],
-            series_y1=loadaverage_data, series_y1_limit=max_loadaverage)
+            series_x1=time_data,
+            series_x1_limit=time_data[-1],
+            series_y1=loadaverage_data,
+            series_y1_limit=max_loadaverage,
+        )
 
         node_network_graph.set_data(
-            series_x1=time_data, series_x1_limit=time_data[-1],
-            series_y1=netin_data, series_y1_limit=max_net,
-            series_x2=time_data, series_x2_limit=time_data[-1],
-            series_y2=netout_data, series_y2_limit=max_net,
+            series_x1=time_data,
+            series_x1_limit=time_data[-1],
+            series_y1=netin_data,
+            series_y1_limit=max_net,
+            series_x2=time_data,
+            series_x2_limit=time_data[-1],
+            series_y2=netout_data,
+            series_y2_limit=max_net,
         )

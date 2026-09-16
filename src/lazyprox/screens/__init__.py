@@ -6,10 +6,10 @@ from .select_server import ServerSelectionScreen
 from .waiting import WaitingScreen
 
 __all__ = [
-           "ActionSelectionScreen",
-           "ConfirmationScreen",
-           "DashboardScreen",
-           "FilterScreen",
-           "ServerSelectionScreen",
-           "WaitingScreen",
+    "ActionSelectionScreen",
+    "ConfirmationScreen",
+    "DashboardScreen",
+    "FilterScreen",
+    "ServerSelectionScreen",
+    "WaitingScreen",
 ]

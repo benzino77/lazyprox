@@ -2,20 +2,24 @@ from textual_plotext import PlotextPlot
 
 
 class GraphWidget(PlotextPlot):
-    def __init__(self, graph_title: str,
-                 data_x_label: str,
-                 data_y_label: str,
-                 series_1_label: str,
-                 series_2_label: str,
-                 series_x1: list | None = None,
-                 series_x1_limit: float | None = None,
-                 series_y1: list | None = None,
-                 series_y1_limit: float | None = None,
-                 series_x2: list | None = None,
-                 series_x2_limit: float | None = None,
-                 series_y2: list | None = None,
-                 series_y2_limit: float | None = None,
-                 *args, **kwargs) -> None:
+    def __init__(
+        self,
+        graph_title: str,
+        data_x_label: str,
+        data_y_label: str,
+        series_1_label: str,
+        series_2_label: str,
+        series_x1: list | None = None,
+        series_x1_limit: float | None = None,
+        series_y1: list | None = None,
+        series_y1_limit: float | None = None,
+        series_x2: list | None = None,
+        series_x2_limit: float | None = None,
+        series_y2: list | None = None,
+        series_y2_limit: float | None = None,
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.graph_title = graph_title
         self.data_x_label = data_x_label
@@ -34,7 +38,17 @@ class GraphWidget(PlotextPlot):
         self.plt.xlabel(data_x_label)
         self.plt.ylabel(data_y_label)
 
-    def set_data(self, series_x1: list, series_x1_limit: float | None, series_y1: list, series_y1_limit: float | None, series_x2: list | None = None, series_x2_limit: float | None = None, series_y2: list | None = None, series_y2_limit: float | None = None) -> None:
+    def set_data(
+        self,
+        series_x1: list,
+        series_x1_limit: float | None,
+        series_y1: list,
+        series_y1_limit: float | None,
+        series_x2: list | None = None,
+        series_x2_limit: float | None = None,
+        series_y2: list | None = None,
+        series_y2_limit: float | None = None,
+    ) -> None:
         self.series_x1 = series_x1
         self.series_x1_limit = series_x1_limit
         self.series_y1 = series_y1
@@ -53,12 +67,10 @@ class GraphWidget(PlotextPlot):
 
         self.plt.clear_data()
         self.plt.date_form(input_form="d/m/Y H:M:S Z", output_form="H:M")
-        self.plt.plot(self.series_x1,
-                      self.series_y1, marker="braille", label=self.series_1_label)
+        self.plt.plot(self.series_x1, self.series_y1, marker="braille", label=self.series_1_label)
 
         if self.series_x2 != [] and self.series_y2 != []:
-            self.plt.plot(self.series_x2,
-                          self.series_y2, marker="braille", label=self.series_2_label)
+            self.plt.plot(self.series_x2, self.series_y2, marker="braille", label=self.series_2_label)
 
         self.plt.xlim(right=self.series_x1_limit)
         self.plt.ylim(0, self.series_y1_limit)

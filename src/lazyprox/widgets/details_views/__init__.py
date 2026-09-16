@@ -9,5 +9,15 @@ from .qemu_graph import QemuGraphWidget
 from .qemu_summary import QemuSummaryWidget
 from .summary_base import BaseSummaryView
 
-__all__ = ["BaseGraphView", "BaseSummaryView", "GraphWidget", "LXCGraphWidget", "LXCSummaryWidget",
-           "NodeGraphWidget", "NodeSummaryWidget", "NodeTasksWidget", "QemuGraphWidget", "QemuSummaryWidget"]
+__all__ = [
+    "BaseGraphView",
+    "BaseSummaryView",
+    "GraphWidget",
+    "LXCGraphWidget",
+    "LXCSummaryWidget",
+    "NodeGraphWidget",
+    "NodeSummaryWidget",
+    "NodeTasksWidget",
+    "QemuGraphWidget",
+    "QemuSummaryWidget",
+]

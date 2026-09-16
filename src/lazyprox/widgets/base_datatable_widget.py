@@ -19,6 +19,7 @@ class BaseDataTableWidget(DataTable):
     This is a base class for all widgets which are used to display data in a table.
     It implements common functionality for all tables like sorting, filtering, updating data in the table.
     """
+
     class ColumnDict(TypedDict):
         name: str
         sort_key: str
@@ -67,12 +68,14 @@ class BaseDataTableWidget(DataTable):
             details_widget = self.screen.query_one(self.details_widget)
         except NoMatches:
             return
-        if (self.cursor_row >= 0 and len(self.rows) > 0):
+        if self.cursor_row >= 0 and len(self.rows) > 0:
             details_widget.update_details_data(
-                selected_type=self.table_type, data=self.get_row_at(self.cursor_row), details_mode=self.details_mode[0])
+                selected_type=self.table_type, data=self.get_row_at(self.cursor_row), details_mode=self.details_mode[0]
+            )
         else:
             details_widget.update_details_data(
-                selected_type=self.table_type, data=None, details_mode=self.details_mode[0])
+                selected_type=self.table_type, data=None, details_mode=self.details_mode[0]
+            )
 
     def build_row(self) -> Iterable:
         """
@@ -89,8 +92,7 @@ class BaseDataTableWidget(DataTable):
             self.details_mode.append(self.details_mode.pop(0))
 
     def remove_border_indicator(self, indicator: str) -> None:
-        self.border_title = self.border_title.replace(
-            f" {indicator}", "").replace(indicator, "")
+        self.border_title = self.border_title.replace(f" {indicator}", "").replace(indicator, "")
 
     def add_border_indicator(self, indicator: str) -> None:
         self.remove_border_indicator(indicator)
@@ -104,11 +106,7 @@ class BaseDataTableWidget(DataTable):
             if column is None:
                 continue
             if sort_column and name == sort_column:
-                arrow = (
-                    SORT_ARROW_DOWN
-                    if self.column_sort_order.get(sort_column, False)
-                    else SORT_ARROW_UP
-                )
+                arrow = SORT_ARROW_DOWN if self.column_sort_order.get(sort_column, False) else SORT_ARROW_UP
                 label = Text(f"{name}{arrow}", style="italic")
             else:
                 label = Text(name)
@@ -126,8 +124,7 @@ class BaseDataTableWidget(DataTable):
                 filtered_data.append(row)
 
         # let's store keys of the rows which should be in the table
-        filtered_row_keys = [data[self.row_index_position]
-                             for data in filtered_data]
+        filtered_row_keys = [data[self.row_index_position] for data in filtered_data]
 
         # remove existing rows from table which are not in the filtered rows
         for row in list(self.rows):
@@ -141,8 +138,7 @@ class BaseDataTableWidget(DataTable):
             # based on the new data
             if node[self.row_index_position] in existing_rows_keys:
                 for idx, column in enumerate(self.nodes_columns):
-                    self.update_cell(
-                        row_key=node[self.row_index_position], column_key=column["name"], value=node[idx])
+                    self.update_cell(row_key=node[self.row_index_position], column_key=column["name"], value=node[idx])
             # if the row is not in a table it needs to be added because it is not on the list already
             else:
                 self.add_row(*node, key=node[self.row_index_position])
@@ -157,21 +153,17 @@ class BaseDataTableWidget(DataTable):
         # let's store current highlighted selection in the table so when the list will be sorted we can
         # move to the row which was selected before sorting
         selected_row: list = []
-        if (is_selected):
+        if is_selected:
             selected_row = self.get_row_at(self.cursor_row)
 
         # get columns with percentage values, those needs to be sorted different
-        percentage_columns = [
-            col["name"] for col in self.nodes_columns if col["type"] == "percent"]
+        percentage_columns = [col["name"] for col in self.nodes_columns if col["type"] == "percent"]
         # sorting columns with integer values also need to be handled differently
-        integer_columns = [
-            col["name"] for col in self.nodes_columns if col["type"] == "integer"]
+        integer_columns = [col["name"] for col in self.nodes_columns if col["type"] == "integer"]
         if column in percentage_columns:
-            self.sort(column, key=lambda value: float(
-                value[0: -1]), reverse=self.column_sort_order[column])
+            self.sort(column, key=lambda value: float(value[0:-1]), reverse=self.column_sort_order[column])
         elif column in integer_columns:
-            self.sort(column, key=lambda value: int(
-                value), reverse=self.column_sort_order[column])
+            self.sort(column, key=lambda value: int(value), reverse=self.column_sort_order[column])
         else:
             self.sort(column, reverse=self.column_sort_order[column])
         self.sort_by_column = column
@@ -179,8 +171,7 @@ class BaseDataTableWidget(DataTable):
 
         if is_selected and has_focus:
             # selected an index of a row which key is stored in the row_index_position element of the selected row
-            selected_row_index = self.get_row_index(
-                selected_row[self.row_index_position])
+            selected_row_index = self.get_row_index(selected_row[self.row_index_position])
             self.move_cursor(row=selected_row_index, scroll=True)
         if has_focus:
             self._call_update_details()

@@ -4,6 +4,5 @@ from textual.widgets import LoadingIndicator
 
 
 class WaitingScreen(Screen):
-
     def compose(self) -> ComposeResult:
         yield LoadingIndicator()

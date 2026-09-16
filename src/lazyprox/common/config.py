@@ -42,8 +42,7 @@ class _Config:
 
         if not config_file_path:
             # I'm not sure MacOS has this env variable
-            cfg_f = Path(os.getenv("XDG_CONFIG_HOME", Path.home() /
-                         ".config")) / "lazyprox" / "config.toml"
+            cfg_f = Path(os.getenv("XDG_CONFIG_HOME", Path.home() / ".config")) / "lazyprox" / "config.toml"
         else:
             cfg_f = Path(config_file_path)
 

@@ -7,7 +7,6 @@ from lazyprox.widgets import DetailsWidget, LxcWidget, NodeWidget, QemuWidget
 
 
 class DashboardScreen(Screen):
-
     class LeftColumn(VerticalGroup):
         def compose(self) -> ComposeResult:
             yield NodeWidget(id="node_widget")

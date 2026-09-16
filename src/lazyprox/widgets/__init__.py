@@ -5,9 +5,9 @@ from .node_widget import NodeWidget
 from .qemu_widget import QemuWidget
 
 __all__ = [
-           "BaseDataTableWidget",
-           "DetailsWidget",
-           "LxcWidget",
-           "NodeWidget",
-           "QemuWidget",
+    "BaseDataTableWidget",
+    "DetailsWidget",
+    "LxcWidget",
+    "NodeWidget",
+    "QemuWidget",
 ]

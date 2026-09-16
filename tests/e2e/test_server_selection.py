@@ -30,15 +30,8 @@ async def test_server_select_options_match_config():
     async with app.run_test() as pilot:
         await wait_for_server_selection(pilot)
         server_select = app.screen.query_one("#server_select", Select)
-        actual = [
-            (label, value)
-            for label, value in server_select._options
-            if value is not Select.NULL
-        ]
-        expected = [
-            (server["name"], idx)
-            for idx, server in enumerate(Config.configuration["server"])
-        ]
+        actual = [(label, value) for label, value in server_select._options if value is not Select.NULL]
+        expected = [(server["name"], idx) for idx, server in enumerate(Config.configuration["server"])]
         assert actual == expected
 
 

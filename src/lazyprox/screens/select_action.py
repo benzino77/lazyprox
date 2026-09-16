@@ -20,4 +20,3 @@ class ActionSelectionScreen(ModalScreen[str]):
     def on_select_changed(self, event: Select.Changed) -> None:
         if event.value is not Select.BLANK and event.value is not Select.NULL:
             self.dismiss(event.value)
-
