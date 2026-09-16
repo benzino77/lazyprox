@@ -90,7 +90,7 @@ class NodeTasksWidget(DataTable):
             else:
                 desc = f"{task['type']} {task['id']}".strip()
             new_list.append(
-                tuple((start_str, end_str, task["node"], task["user"], desc, task.get("status", "Running"), task["upid"])))
+                (start_str, end_str, task["node"], task["user"], desc, task.get("status", "Running"), task["upid"]))
 
         return new_list
 
