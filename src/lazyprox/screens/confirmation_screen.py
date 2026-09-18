@@ -1,11 +1,14 @@
+from typing import ClassVar
+
 from textual.app import ComposeResult
+from textual.binding import BindingType
 from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, Label
 
 
 class ConfirmationScreen(ModalScreen[bool]):
-    BINDINGS = [("escape", "cancel", "Cancel")]
+    BINDINGS: ClassVar[list[BindingType]] = [("escape", "cancel", "Cancel")]
 
     def __init__(self, question: str):
         super().__init__()

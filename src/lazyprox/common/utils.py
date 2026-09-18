@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from textual.widget import Widget
 
 
@@ -31,6 +33,16 @@ def calculate_uptime(uptime_seconds: int) -> str:
     hours, remainder = divmod(remainder, 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{days}d {hours}h {minutes}m {seconds}s"
+
+
+def format_timestamp(timestamp: int) -> str:
+    """Convert a Proxmox RRD timestamp into a date/time string with its time zone.
+    Args:
+        timestamp: The Unix timestamp to convert.
+    Returns:
+        A string representing the timestamp in the format "dd/mm/YYYY HH:MM:SS TZ".
+    """
+    return datetime.fromtimestamp(timestamp, tz=UTC).strftime("%d/%m/%Y %H:%M:%S %Z")
 
 
 def format_bytes(bytes_value: int) -> str:

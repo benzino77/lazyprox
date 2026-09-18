@@ -1,11 +1,14 @@
-import os
+import subprocess
+from collections.abc import Callable
 from itertools import product
-from typing import Literal
+from typing import Any, ClassVar, Literal
 
 from textual import work
 from textual.app import App
-from textual.binding import Binding
+from textual.binding import Binding, BindingType
+from textual.css.query import NoMatches
 from textual.message import Message
+from textual.screen import Screen
 from textual.timer import Timer
 from textual.widgets import DataTable
 
@@ -25,7 +28,7 @@ from .resource_actions import ResourceActions
 
 
 class LazyProx(App):
-    BINDINGS = [
+    BINDINGS: ClassVar[list[BindingType]] = [
         Binding("D", "dump_debug", "Dump debug", show=False),
         ("f", "filter", "Filter"),
         ("s", "change_server", "Change server"),
@@ -33,9 +36,11 @@ class LazyProx(App):
     ]
 
     CSS_PATH = "styles.tcss"
-    SCREENS = {"select_server": ServerSelectionScreen,
-               "waiting": WaitingScreen,
-               "dashboard": DashboardScreen}
+    SCREENS: ClassVar[dict[str, Callable[[], Screen[Any]]]] = {
+        "select_server": ServerSelectionScreen,
+        "waiting": WaitingScreen,
+        "dashboard": DashboardScreen,
+    }
 
     class _AppMessage(Message):
         def __init__(self, msg: dict | None = None):
@@ -59,8 +64,7 @@ class LazyProx(App):
         super().__init__()
 
     def _notify_error(self, message: str) -> None:
-        self.notify(message=message,
-                    title="Something went wrong...", severity="error")
+        self.notify(message=message, title="Something went wrong...", severity="error")
 
     def handle_update_message(self, msg: Message) -> None:
         success = msg.msg["success"]
@@ -81,7 +85,7 @@ class LazyProx(App):
         try:
             widget = self.screen.query_one(widget_cls)
             widget.update_table_data()
-        except Exception:
+        except NoMatches:
             return
 
     def stop_timers(self) -> None:
@@ -98,19 +102,19 @@ class LazyProx(App):
         nodes = ProxmoxData.p_prox_resources.get(ProxmoxData.BASE_NODES, [])
         for node in nodes:
             node_name: str = node["node"]
+            ProxmoxData.refresh_api_information(ProxmoxData.NODE_STATUS.format(node_name=node_name))
             ProxmoxData.refresh_api_information(
-                ProxmoxData.NODE_STATUS.format(node_name=node_name))
-            ProxmoxData.refresh_api_information(ProxmoxData.NODE_GUEST_DATA.format(
-                node_name=node_name, resource_type="qemu"))
+                ProxmoxData.NODE_GUEST_DATA.format(node_name=node_name, resource_type="qemu")
+            )
             ProxmoxData.refresh_api_information(
-                ProxmoxData.NODE_GUEST_DATA.format(node_name=node_name, resource_type="lxc"))
+                ProxmoxData.NODE_GUEST_DATA.format(node_name=node_name, resource_type="lxc")
+            )
 
     def refresh_rrd_nodes_data(self) -> None:
         nodes = ProxmoxData.p_prox_resources.get(ProxmoxData.BASE_NODES, [])
         for node in nodes:
             node_name: str = node["node"]
-            ProxmoxData.refresh_api_information(
-                ProxmoxData.NODE_RRDDATA.format(node_name=node_name))
+            ProxmoxData.refresh_api_information(ProxmoxData.NODE_RRDDATA.format(node_name=node_name))
 
     def refresh_task_nodes_data(self) -> None:
         ProxmoxData.refresh_api_information(ProxmoxData.CLUSTER_TASKS)
@@ -124,9 +128,8 @@ class LazyProx(App):
                 self.refresh_rrd_nodes_data()
             if data_type == "tasks":
                 self.refresh_task_nodes_data()
-            msg = self.NodesUpdated(
-                {"success": True, "text": "Nodes data updated successfully"})
-        except Exception as e:
+            msg = self.NodesUpdated({"success": True, "text": "Nodes data updated successfully"})
+        except Exception as e:  # noqa: BLE001
             msg = self.NodesUpdated({"success": False, "text": str(e)})
         finally:
             self.post_message(msg)
@@ -135,8 +138,8 @@ class LazyProx(App):
     def refresh_guests_data(self, data_type: str, guest_type: Literal["qemu", "lxc"]) -> None:
         """Refresh guests data
         Args:
-            data_type: API path for the type of data to collect. 
-                Example: 
+            data_type: API path for the type of data to collect.
+                Example:
                     nodes/{node_name}/{resource_type}/{vmid}/status/current
                     nodes/{node_name}/{resource_type}/{vmid}/rrddata
             guest_type: type of the guest for which data should be collected
@@ -152,14 +155,12 @@ class LazyProx(App):
 
         try:
             for g in guests:
-                ProxmoxData.refresh_api_information(data_type.format(
-                    node_name=g["node"], resource_type=guest_type, vmid=g["vmid"]))
+                ProxmoxData.refresh_api_information(
+                    data_type.format(node_name=g["node"], resource_type=guest_type, vmid=g["vmid"])
+                )
 
-            msg = msg_cls(
-                {"success": True,
-                    "text": f"{guest_type.capitalize()} data updated successfully"}
-            )
-        except Exception as e:
+            msg = msg_cls({"success": True, "text": f"{guest_type.capitalize()} data updated successfully"})
+        except Exception as e:  # noqa: BLE001
             msg = msg_cls({"success": False, "text": str(e)})
         finally:
             self.post_message(msg)
@@ -176,9 +177,8 @@ class LazyProx(App):
             self.refresh_basic_nodes_data()
             self.refresh_rrd_nodes_data()
             self.refresh_task_nodes_data()
-            msg = self.ProxmoxInitialized(
-                {"success": True, "text": "Proxmox initialized successfully"})
-        except Exception as e:
+            msg = self.ProxmoxInitialized({"success": True, "text": "Proxmox initialized successfully"})
+        except Exception as e:  # noqa: BLE001
             msg = self.ProxmoxInitialized({"success": False, "text": str(e)})
         finally:
             self.post_message(msg)
@@ -205,19 +205,13 @@ class LazyProx(App):
             self._notify_error(text)
         else:
             # now we can start timers to update data in the background
-            interval = Config.configuration.get(
-                "application").get("refresh_interval")
-            rrd_interval = Config.configuration.get(
-                "application").get("refresh_interval_rrddata")
-            tasks_interval = Config.configuration.get(
-                "application").get("refresh_interval_tasks")
-            self.timers.append(self.set_interval(interval, lambda:
-                                                 self.refresh_nodes_data("basic")))
-            self.timers.append(self.set_interval(rrd_interval, lambda:
-                                                 self.refresh_nodes_data("rrddata")))
+            interval = Config.configuration.get("application").get("refresh_interval")
+            rrd_interval = Config.configuration.get("application").get("refresh_interval_rrddata")
+            tasks_interval = Config.configuration.get("application").get("refresh_interval_tasks")
+            self.timers.append(self.set_interval(interval, lambda: self.refresh_nodes_data("basic")))
+            self.timers.append(self.set_interval(rrd_interval, lambda: self.refresh_nodes_data("rrddata")))
 
-            self.timers.append(self.set_interval(tasks_interval, lambda:
-                                                 self.refresh_nodes_data("tasks")))
+            self.timers.append(self.set_interval(tasks_interval, lambda: self.refresh_nodes_data("tasks")))
 
             # before starting intervals for guests lets get asynchronously their data
             # so it will be collected before timers collects data for the first time after interval
@@ -225,14 +219,17 @@ class LazyProx(App):
             # until the first interval is finished and data is collected for the first time
             # "product" function is used to produce pairs of data type and guest type for which we want to collect data,
             # so we will have pairs like ("status/current", "lxc"), ("rrddata", "lxc"), ("status/current", "qemu"), ("rrddata", "qemu")
-            pairs = list(
-                product([ProxmoxData.GUEST_STATUS, ProxmoxData.GUEST_RRDDATA], ["lxc", "qemu"]))
+            pairs = list(product([ProxmoxData.GUEST_STATUS, ProxmoxData.GUEST_RRDDATA], ["lxc", "qemu"]))
             for data_type, guest_type in pairs:
                 # collect data asap
                 self.refresh_guests_data(data_type, guest_type)
                 # then start intervals to collect data in the background
-                self.timers.append(self.set_interval(interval if data_type == "basic" else rrd_interval,
-                                   lambda t=data_type, g=guest_type: self.refresh_guests_data(t, g)))
+                self.timers.append(
+                    self.set_interval(
+                        interval if data_type == "basic" else rrd_interval,
+                        lambda t=data_type, g=guest_type: self.refresh_guests_data(t, g),
+                    )
+                )
 
         # update widgets if the data is available it will display gathered information
         # in other case the data in widgets will be cleared
@@ -244,9 +241,8 @@ class LazyProx(App):
                 widget.update_table_data()
                 widget.action_scroll_top()
                 # set focus on the NodeWidget after Proxmox is initialized
-                self.screen.set_focus(
-                    widget) if widget_type is NodeWidget else None
-            except Exception:
+                self.screen.set_focus(widget) if widget_type is NodeWidget else None
+            except NoMatches:
                 continue
 
     def on_lazy_prox_nodes_updated(self, nu: NodesUpdated) -> None:
@@ -273,7 +269,9 @@ class LazyProx(App):
 
         if selected_action == "SSH":
             with self.suspend():
-                os.system(f"ssh {resource_name}")
+                # ssh has to block on purpose: the app is suspended and the
+                # terminal is handed over to the ssh session until the user exits.
+                subprocess.run(["ssh", resource_name], check=False)  # noqa: ASYNC221
             self.app.refresh()
             return
 
@@ -284,9 +282,10 @@ class LazyProx(App):
 
         try:
             resource_actions.perform_action(selected_action)
-            self.notify(message=f"{selected_action} on {resource_name} successful", title="Action",
-                        severity="information")
-        except Exception as e:
+            self.notify(
+                message=f"{selected_action} on {resource_name} successful", title="Action", severity="information"
+            )
+        except Exception as e:  # noqa: BLE001
             self._notify_error(str(e))
 
     @work()
@@ -316,9 +315,8 @@ class LazyProx(App):
     def action_dump_debug(self):
         try:
             path = ProxmoxData.dump_resources()
-            self.notify(message=str(path), title="Dump file saved",
-                        severity="information")
-        except Exception as e:
+            self.notify(message=str(path), title="Dump file saved", severity="information")
+        except Exception as e:  # noqa: BLE001
             self._notify_error(str(e))
 
     def action_quit(self) -> None:

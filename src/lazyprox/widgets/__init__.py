@@ -4,5 +4,10 @@ from .lxc_widget import LxcWidget
 from .node_widget import NodeWidget
 from .qemu_widget import QemuWidget
 
-__all__ = ["BaseDataTableWidget", "DetailsWidget",
-           "NodeWidget", "LxcWidget", "QemuWidget"]
+__all__ = [
+    "BaseDataTableWidget",
+    "DetailsWidget",
+    "LxcWidget",
+    "NodeWidget",
+    "QemuWidget",
+]

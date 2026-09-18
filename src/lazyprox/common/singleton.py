@@ -4,12 +4,9 @@ Thread-safe singleton decorator for Python classes.
 
 import threading
 from functools import wraps
-from typing import Type, TypeVar
-
-T = TypeVar('T')
 
 
-def singleton(cls: Type[T]) -> Type[T]:
+def singleton[T](cls: type[T]) -> type[T]:
     """
     A thread-safe singleton decorator for Python classes.
 

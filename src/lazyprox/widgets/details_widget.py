@@ -15,7 +15,6 @@ from lazyprox.widgets.details_views import (
 
 
 class DetailsWidget(ContentSwitcher):
-
     def compose(self) -> ComposeResult:
         yield NodeSummaryWidget(id="node_summary_widget")
         yield NodeGraphWidget(id="node_graphs_widget")
@@ -25,10 +24,11 @@ class DetailsWidget(ContentSwitcher):
         yield QemuSummaryWidget(id="qemu_summary_widget")
         yield QemuGraphWidget(id="qemu_graphs_widget")
 
-    def update_details_data(self, selected_type: Literal["node", "lxc", "qemu"], data: list[str] | None, details_mode: str | None) -> None:
+    def update_details_data(
+        self, selected_type: Literal["node", "lxc", "qemu"], data: list[str] | None, details_mode: str | None
+    ) -> None:
         if details_mode:
-            self.parent.border_title = details_mode.replace(
-                "_", " ").capitalize()
+            self.parent.border_title = details_mode.replace("_", " ").capitalize()
 
         if selected_type == "node":
             if details_mode == "summary":

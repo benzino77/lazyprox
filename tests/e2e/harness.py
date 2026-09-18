@@ -13,6 +13,4 @@ async def wait_for_server_selection(pilot: Pilot) -> None:
         if isinstance(pilot.app.screen, ServerSelectionScreen):
             return
         await pilot.pause()
-    raise AssertionError(
-        f"Expected ServerSelectionScreen, got {type(pilot.app.screen).__name__}"
-    )
+    raise AssertionError(f"Expected ServerSelectionScreen, got {type(pilot.app.screen).__name__}")

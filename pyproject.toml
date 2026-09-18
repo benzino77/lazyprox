@@ -35,6 +35,9 @@ dev = [
     "textual-dev>=1.8.0",
 ]
 
+[tool.ruff]
+line-length = 120
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]

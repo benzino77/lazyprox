@@ -5,5 +5,11 @@ from .select_action import ActionSelectionScreen
 from .select_server import ServerSelectionScreen
 from .waiting import WaitingScreen
 
-__all__ = ["ConfirmationScreen", "DashboardScreen", "FilterScreen",
-           "ServerSelectionScreen", "WaitingScreen", "ActionSelectionScreen",]
+__all__ = [
+    "ActionSelectionScreen",
+    "ConfirmationScreen",
+    "DashboardScreen",
+    "FilterScreen",
+    "ServerSelectionScreen",
+    "WaitingScreen",
+]

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from textual.widgets import DataTable, data_table
 
@@ -30,7 +30,6 @@ TASK_DESCRIPTIONS: dict[str, str] = {
 
 
 class NodeTasksWidget(DataTable):
-
     # for now this widget is only for displaying cluster tasks, so it does not need to propagate "selected" event
     # it will be then implemented in the future displaying details of the selected task
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
@@ -54,8 +53,7 @@ class NodeTasksWidget(DataTable):
             row_data: list[str] = []
             for col_key in column_keys:
                 cell = self.get_cell(row_key, col_key)
-                row_data.append(cell.plain if hasattr(
-                    cell, "plain") else str(cell))
+                row_data.append(cell.plain if hasattr(cell, "plain") else str(cell))
             current_list.append(tuple(row_data))
         return current_list
 
@@ -78,19 +76,17 @@ class NodeTasksWidget(DataTable):
         tasks.sort(key=lambda t: t.get("starttime", 0), reverse=True)
 
         for task in tasks:
-            start_str = datetime.fromtimestamp(
-                task["starttime"]).strftime("%b %d %H:%M:%S")
+            start_str = datetime.fromtimestamp(task["starttime"], tz=UTC).astimezone().strftime("%b %d %H:%M:%S")
             endtime = task.get("endtime", 0)
-            end_str = datetime.fromtimestamp(endtime).strftime(
-                "%b %d %H:%M:%S") if endtime else ""
+            end_str = datetime.fromtimestamp(endtime, tz=UTC).astimezone().strftime("%b %d %H:%M:%S") if endtime else ""
             desc_template = TASK_DESCRIPTIONS.get(task["type"])
             if desc_template:
-                desc = desc_template.format(
-                    id=task["id"]) if "{id}" in desc_template else desc_template
+                desc = desc_template.format(id=task["id"]) if "{id}" in desc_template else desc_template
             else:
                 desc = f"{task['type']} {task['id']}".strip()
             new_list.append(
-                tuple((start_str, end_str, task["node"], task["user"], desc, task.get("status", "Running"), task["upid"])))
+                (start_str, end_str, task["node"], task["user"], desc, task.get("status", "Running"), task["upid"])
+            )
 
         return new_list
 

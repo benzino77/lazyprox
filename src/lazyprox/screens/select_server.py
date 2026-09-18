@@ -1,4 +1,3 @@
-
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Select
@@ -7,9 +6,12 @@ from lazyprox.common import Config
 
 
 class ServerSelectionScreen(Screen[int]):
-
     def compose(self) -> ComposeResult:
-        yield Select(id="server_select", prompt="Select server", options=[(server['name'], idx) for idx, server in enumerate(Config.configuration.get("server"))])
+        yield Select(
+            id="server_select",
+            prompt="Select server",
+            options=[(server["name"], idx) for idx, server in enumerate(Config.configuration.get("server"))],
+        )
 
     def on_select_changed(self, event: Select.Changed) -> None:
         if event.value is not Select.BLANK and event.value is not Select.NULL:

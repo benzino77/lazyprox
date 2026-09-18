@@ -9,7 +9,7 @@ from lazyprox.common import Config, singleton
 
 
 @singleton
-class _ProxmoxData():
+class _ProxmoxData:
     BASE_NODES: str = "nodes"
     NODE_STATUS: str = "nodes/{node_name}/status"
     NODE_RRDDATA: str = "nodes/{node_name}/rrddata"
@@ -24,8 +24,13 @@ class _ProxmoxData():
     def initialize(self) -> None:
         cfg = Config.configuration.get("server")[Config.server_index]
 
-        self.prox: ProxmoxAPI = ProxmoxAPI(cfg["host"], user=f"{cfg['user']}@{cfg['realm']}",
-                                           token_name=cfg["token_name"], token_value=cfg["token_value"], verify_ssl=cfg.get("verify_ssl", True))
+        self.prox: ProxmoxAPI = ProxmoxAPI(
+            cfg["host"],
+            user=f"{cfg['user']}@{cfg['realm']}",
+            token_name=cfg["token_name"],
+            token_value=cfg["token_value"],
+            verify_ssl=cfg.get("verify_ssl", True),
+        )
         # clear current data, we will be collecting new data based on new ProxmoxAPI
         self.p_prox_resources = {}
 
@@ -35,12 +40,9 @@ class _ProxmoxData():
         if api.find("rrddata") == -1:
             info = self.prox(api).get()
         else:
-            rrddata_timeframe = Config.configuration.get(
-                "application").get("rrddata_timeframe")
-            rrddata_cf = Config.configuration.get(
-                "application").get("rrddata_cf")
-            info = self.prox(api).get(timeframe=rrddata_timeframe,
-                                      cf=rrddata_cf)
+            rrddata_timeframe = Config.configuration.get("application").get("rrddata_timeframe")
+            rrddata_cf = Config.configuration.get("application").get("rrddata_cf")
+            info = self.prox(api).get(timeframe=rrddata_timeframe, cf=rrddata_cf)
         self.p_prox_resources[api] = info
 
     def get_node_information(self, node_name: str) -> dict:
@@ -49,10 +51,8 @@ class _ProxmoxData():
         for node in nodes:
             if node["node"] == node_name:
                 node_info = deepcopy(node)
-                node_info["full_status"] = self.p_prox_resources.get(
-                    self.NODE_STATUS.format(node_name=node_name))
-                node_info["rrddata"] = self.p_prox_resources.get(
-                    self.NODE_RRDDATA.format(node_name=node_name))
+                node_info["full_status"] = self.p_prox_resources.get(self.NODE_STATUS.format(node_name=node_name))
+                node_info["rrddata"] = self.p_prox_resources.get(self.NODE_RRDDATA.format(node_name=node_name))
                 break
 
         return node_info
@@ -60,7 +60,8 @@ class _ProxmoxData():
     def get_guest_information(self, node_name: str, resource_type: Literal["lxc", "qemu"], vmid: str) -> dict:
         guest_info = {}
         for g in self.p_prox_resources.get(
-                self.NODE_GUEST_DATA.format(node_name=node_name, resource_type=resource_type), []):
+            self.NODE_GUEST_DATA.format(node_name=node_name, resource_type=resource_type), []
+        ):
             if g["vmid"] == int(vmid):
                 guest_info = deepcopy(g)
                 break
@@ -70,9 +71,11 @@ class _ProxmoxData():
 
         guest_info["node"] = node_name
         guest_info["status/current"] = self.p_prox_resources.get(
-            self.GUEST_STATUS.format(node_name=node_name, resource_type=resource_type, vmid=vmid), {})
+            self.GUEST_STATUS.format(node_name=node_name, resource_type=resource_type, vmid=vmid), {}
+        )
         guest_info["rrddata"] = self.p_prox_resources.get(
-            self.GUEST_RRDDATA.format(node_name=node_name, resource_type=resource_type, vmid=vmid), {})
+            self.GUEST_RRDDATA.format(node_name=node_name, resource_type=resource_type, vmid=vmid), {}
+        )
 
         return guest_info
 
@@ -84,16 +87,26 @@ class _ProxmoxData():
         vms: list = []
         for node in nodes:
             vms_on_node: list = self.p_prox_resources.get(
-                self.NODE_GUEST_DATA.format(node_name=node["node"], resource_type=resource_type), [])
+                self.NODE_GUEST_DATA.format(node_name=node["node"], resource_type=resource_type), []
+            )
             # filter out resources which are templates
-            vms_on_node = [
-                vm for vm in vms_on_node if vm.get("template", 0) != 1]
+            vms_on_node = [vm for vm in vms_on_node if vm.get("template", 0) != 1]
             # add node information to each lxc
             vms_on_node = [
-                {**vm,
-                 "node": node["node"],
-                 "status/current": self.p_prox_resources.get(self.GUEST_STATUS.format(node_name=node["node"], resource_type=resource_type, vmid=vm["vmid"]), {}),
-                 "rrddata": self.p_prox_resources.get(self.GUEST_RRDDATA.format(node_name=node["node"], resource_type=resource_type, vmid=vm["vmid"]), {})} for vm in vms_on_node]
+                {
+                    **vm,
+                    "node": node["node"],
+                    "status/current": self.p_prox_resources.get(
+                        self.GUEST_STATUS.format(node_name=node["node"], resource_type=resource_type, vmid=vm["vmid"]),
+                        {},
+                    ),
+                    "rrddata": self.p_prox_resources.get(
+                        self.GUEST_RRDDATA.format(node_name=node["node"], resource_type=resource_type, vmid=vm["vmid"]),
+                        {},
+                    ),
+                }
+                for vm in vms_on_node
+            ]
             vms.extend(vms_on_node)
         return vms
 
@@ -102,8 +115,7 @@ class _ProxmoxData():
 
     def dump_resources(self) -> Path:
         """Dump all resources to file"""
-        dest: Path = Path(Config.configuration.get("application").get(
-            "debug_dump_dest"))
+        dest: Path = Path(Config.configuration.get("application").get("debug_dump_dest"))
 
         with dest.open("w") as f:
             json.dump(self.p_prox_resources, f)

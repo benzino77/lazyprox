@@ -4,21 +4,42 @@ from lazyprox.data import ProxmoxData
 
 
 class ResourceActions:
-
     def __init__(self, event: DataTable.RowSelected):
         self.actions: dict = {
             "node": {
-                "online": ["Shutdown", "Reboot", "SSH",],
-                "offline": ["Start",]
+                "online": [
+                    "Shutdown",
+                    "Reboot",
+                    "SSH",
+                ],
+                "offline": [
+                    "Start",
+                ],
             },
             "lxc": {
-                "running": ["Shutdown", "Reboot", "Stop", "SSH",],
-                "stopped": ["Start",]
+                "running": [
+                    "Shutdown",
+                    "Reboot",
+                    "Stop",
+                    "SSH",
+                ],
+                "stopped": [
+                    "Start",
+                ],
             },
             "qemu": {
-                "running": ["Shutdown", "Reboot", "Hibernate", "Stop", "Reset", "SSH",],
-                "stopped": ["Start",]
-            }
+                "running": [
+                    "Shutdown",
+                    "Reboot",
+                    "Hibernate",
+                    "Stop",
+                    "Reset",
+                    "SSH",
+                ],
+                "stopped": [
+                    "Start",
+                ],
+            },
         }
         self.event = event
 
@@ -65,8 +86,7 @@ class ResourceActions:
         if resource_type == "qemu":
             # hibernate action in fact is named "suspend" and needs to pass parameter "todisk"
             if action == "hibernate":
-                ProxmoxData.prox.nodes(node).qemu(
-                    vmid).status.post("suspend", todisk=1)
+                ProxmoxData.prox.nodes(node).qemu(vmid).status.post("suspend", todisk=1)
             else:
                 ProxmoxData.prox.nodes(node).qemu(vmid).status.post(action)
         if resource_type == "node":
