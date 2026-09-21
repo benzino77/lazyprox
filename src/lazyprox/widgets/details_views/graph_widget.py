@@ -1,4 +1,7 @@
+from textual.color import Color
 from textual_plotext import PlotextPlot
+
+from lazyprox.common import Config
 
 
 class GraphWidget(PlotextPlot):
@@ -64,13 +67,20 @@ class GraphWidget(PlotextPlot):
         self.refresh()
 
     def render_graph(self) -> None:
+        series_1_kwargs = {}
+        series_2_kwargs = {}
+        if (Config.configuration or {}).get("theme"):
+            series_1_kwargs["color"] = Color.parse(self.app.theme_variables["primary"]).rgb
+            series_2_kwargs["color"] = Color.parse(self.app.theme_variables["accent"]).rgb
 
         self.plt.clear_data()
         self.plt.date_form(input_form="d/m/Y H:M:S Z", output_form="H:M")
-        self.plt.plot(self.series_x1, self.series_y1, marker="braille", label=self.series_1_label)
+        self.plt.plot(self.series_x1, self.series_y1, marker="braille", label=self.series_1_label, **series_1_kwargs)
 
         if self.series_x2 != [] and self.series_y2 != []:
-            self.plt.plot(self.series_x2, self.series_y2, marker="braille", label=self.series_2_label)
+            self.plt.plot(
+                self.series_x2, self.series_y2, marker="braille", label=self.series_2_label, **series_2_kwargs
+            )
 
         self.plt.xlim(right=self.series_x1_limit)
         self.plt.ylim(0, self.series_y1_limit)

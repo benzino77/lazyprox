@@ -1,10 +1,23 @@
 import os
 import tomllib as toml
 from pathlib import Path
+from typing import Annotated
 
-from pydantic import BaseModel
+from pydantic import AfterValidator, BaseModel
+from textual.color import Color, ColorParseError
 
 from .singleton import singleton
+
+
+def _validate_color(value: str) -> str:
+    try:
+        Color.parse(value)
+    except ColorParseError as e:
+        raise ValueError(str(e)) from e
+    return value
+
+
+ColorString = Annotated[str, AfterValidator(_validate_color)]
 
 
 class ProxmoxServerConfig(BaseModel):
@@ -26,10 +39,25 @@ class ApplicationConfig(BaseModel):
     rrddata_cf: str | None = "AVERAGE"  # consolidation function
 
 
+class ThemeConfig(BaseModel):
+    primary: ColorString
+    secondary: ColorString
+    accent: ColorString
+    warning: ColorString
+    error: ColorString
+    success: ColorString
+    foreground: ColorString
+    background: ColorString
+    surface: ColorString
+    panel: ColorString
+    dark: bool = True
+
+
 class ConfigDict(BaseModel):
     server: list[ProxmoxServerConfig]
     # use default values if missing
     application: ApplicationConfig | None = ApplicationConfig()
+    theme: ThemeConfig | None = None
 
 
 @singleton

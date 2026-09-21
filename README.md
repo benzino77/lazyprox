@@ -46,6 +46,8 @@ To run the tool, simply run `lazyprox` in your terminal. To get best experience 
 
 Although it is rather easy to get information about the structure of the configuration file from the code, and what needs to be configured on the proxmox server side, you can also get it in a more user-friendly format by buying me a coffee. If you want to support the project and get the instructions on how to create the configuration file with all the necessary details and examples in PDF format, you can do so via [Ko-fi](https://ko-fi.com/s/353196d42e).
 
+The look of the TUI can be customized with a color palette in the configuration file. Popular schemes such as Catppuccin, Tokyo Night, Nord, Dracula, or Gruvbox can be used by adding their color entries to the config; LazyProx applies them on startup.
+
 ## Running in Docker
 
 You can also run LazyProx in a Docker container - you do not have to install it via `uv` or `pipx` directly on your system. You can build the Docker image using the provided `Dockerfile` and then run the container or you can pull the prebuilt image from github container registry.

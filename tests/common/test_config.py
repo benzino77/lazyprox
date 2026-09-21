@@ -1,8 +1,12 @@
+import pytest
+from pydantic import ValidationError
+
 from lazyprox.common.config import (
     ApplicationConfig,
     Config,
     ConfigDict,
     ProxmoxServerConfig,
+    ThemeConfig,
     _Config,
 )
 
@@ -15,6 +19,19 @@ VALID_SERVER = {
     "token_value": "secret",
 }
 
+VALID_THEME = {
+    "primary": "#BB9AF7",
+    "secondary": "#7AA2F7",
+    "accent": "#FF9E64",
+    "warning": "#E0AF68",
+    "error": "#F7768E",
+    "success": "#9ECE6A",
+    "foreground": "#a9b1d6",
+    "background": "#1A1B26",
+    "surface": "#24283B",
+    "panel": "#414868",
+}
+
 VALID_TOML = """\
 [[server]]
 name = "proxmox1"
@@ -24,6 +41,24 @@ realm = "pam"
 token_name = "test"
 token_value = "secret"
 """
+
+THEMED_TOML = (
+    VALID_TOML
+    + """\
+
+[theme]
+primary = "#BB9AF7"
+secondary = "#7AA2F7"
+accent = "#FF9E64"
+warning = "#E0AF68"
+error = "#F7768E"
+success = "#9ECE6A"
+foreground = "#a9b1d6"
+background = "#1A1B26"
+surface = "#24283B"
+panel = "#414868"
+"""
+)
 
 
 def test_proxmox_server_config_required_fields():
@@ -98,3 +133,57 @@ def test_load_config_fallback_xdg(tmp_path, monkeypatch):
 
 def test_config_is_singleton_instance():
     assert Config is _Config()
+
+
+def test_config_dict_theme_defaults_none_when_only_server():
+    cfg = ConfigDict(server=[ProxmoxServerConfig(**VALID_SERVER)])
+    assert cfg.theme is None
+
+
+def test_theme_config_full_bag():
+    cfg = ThemeConfig(**VALID_THEME)
+    assert cfg.primary == "#BB9AF7"
+    assert cfg.panel == "#414868"
+
+
+def test_theme_config_dark_defaults_true():
+    cfg = ThemeConfig(**VALID_THEME)
+    assert cfg.dark is True
+
+
+def test_theme_config_dark_false_honored():
+    cfg = ThemeConfig(**VALID_THEME, dark=False)
+    assert cfg.dark is False
+
+
+def test_theme_config_rejects_incomplete_bag():
+    incomplete = {key: value for key, value in VALID_THEME.items() if key != "panel"}
+    with pytest.raises(ValidationError):
+        ThemeConfig(**incomplete)
+
+
+@pytest.mark.parametrize("field", list(VALID_THEME))
+def test_theme_config_rejects_invalid_color(field):
+    with pytest.raises(ValidationError):
+        ThemeConfig(**{**VALID_THEME, field: "not-a-color"})
+
+
+def test_load_config_with_theme(tmp_path):
+    config_file = tmp_path / "config.toml"
+    config_file.write_text(THEMED_TOML)
+
+    Config.load_config(config_file_path=str(config_file))
+
+    assert Config.configuration is not None
+    assert Config.configuration["theme"]["primary"] == "#BB9AF7"
+    assert Config.configuration["theme"]["dark"] is True
+
+
+def test_load_config_without_theme_keeps_theme_none(tmp_path):
+    config_file = tmp_path / "config.toml"
+    config_file.write_text(VALID_TOML)
+
+    Config.load_config(config_file_path=str(config_file))
+
+    assert Config.configuration is not None
+    assert Config.configuration["theme"] is None

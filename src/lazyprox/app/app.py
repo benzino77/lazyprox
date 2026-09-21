@@ -9,6 +9,7 @@ from textual.binding import Binding, BindingType
 from textual.css.query import NoMatches
 from textual.message import Message
 from textual.screen import Screen
+from textual.theme import Theme
 from textual.timer import Timer
 from textual.widgets import DataTable
 
@@ -62,6 +63,10 @@ class LazyProx(App):
     def __init__(self):
         self.timers: list[Timer] = []
         super().__init__()
+        theme_config = (Config.configuration or {}).get("theme")
+        if theme_config:
+            self.register_theme(Theme(name="lazyprox", **theme_config))
+            self.theme = "lazyprox"
 
     def _notify_error(self, message: str) -> None:
         self.notify(message=message, title="Something went wrong...", severity="error")
