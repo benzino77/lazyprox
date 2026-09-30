@@ -56,6 +56,16 @@ You can also run LazyProx in a Docker container - you do not have to install it 
 docker run --name lazyprox -it --rm -v /path/to/config.toml:/config.toml ghcr.io/benzino77/lazyprox:latest -c /config.toml
 ```
 
+## Bulk operations notes
+
+Bulk operations are fire-and-forget: LazyProx sends one request per checked guest and does not wait for the requests to finish or check their result. When the notification says an operation was requested, it means Proxmox accepted the request, not that the guest has already started, stopped, or migrated. Check the Proxmox task list for the outcome. A request that fails does not cancel the remaining ones; the notification reports how many were requested and how many failed.
+
+> [!WARNING]
+> Shutdown is only an attempt at a graceful shutdown. If the guest does not react, LazyProx does not retry, wait, force a stop, or perform any other action. Use the single-guest Stop action for that.
+
+> [!IMPORTANT]
+> Migrate is experimental. It has been tested on a Proxmox cluster with native ZFS storage, where Proxmox uses ZFS mechanisms to move guests between nodes, and it may not work with other storage setups such as Ceph or NFS. Migrating a running QEMU virtual machine transfers its local disks and can take a long time. Running LXC containers are migrated in restart mode: the container is stopped, migrated, and started on the target node.
+
 ## Disclaimer
 
 Everything you do, you do on your own responsibility. I do not take any responsibility for damages or problems, that may arise as a result of using this solution or its products. It is provided "as is" without any warranties or guarantees. Use it at your own risk.

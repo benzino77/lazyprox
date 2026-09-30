@@ -83,6 +83,7 @@ ConfirmationScreen {
 }
 
 #confirm_question {
+    min-width: 36;
     margin-bottom: 1;
     text-align: center;
 }
@@ -106,5 +107,50 @@ ConfirmationScreen {
 }
 .details_right {
     width: 4fr;
+}
+
+BulkScreen {
+    align: center middle;
+}
+
+#bulk_dialog {
+    width: 80;
+    height: auto;
+    max-height: 90%;
+    border: round $primary;
+    padding: 1;
+}
+
+#bulk_operation {
+    width: 100%;
+}
+
+#bulk_migrate {
+    height: auto;
+    width: 100%;
+}
+
+#bulk_source {
+    width: 1fr;
+    margin-right: 1;
+}
+
+#bulk_target {
+    width: 1fr;
+}
+
+#bulk_guests {
+    height: 12;
+    margin-top: 1;
+}
+
+#bulk_buttons {
+    align: right middle;
+    height: auto;
+    margin-top: 1;
+}
+
+#bulk_cancel {
+    margin-right: 1;
 }
 
