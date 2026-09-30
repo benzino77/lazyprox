@@ -17,6 +17,7 @@ from lazyprox.common import Config
 from lazyprox.data import ProxmoxData
 from lazyprox.screens import (
     ActionSelectionScreen,
+    BulkScreen,
     ConfirmationScreen,
     DashboardScreen,
     FilterScreen,
@@ -25,12 +26,14 @@ from lazyprox.screens import (
 )
 from lazyprox.widgets import LxcWidget, NodeWidget, QemuWidget
 
+from .bulk import dispatch_bulk, snapshot_guests
 from .resource_actions import ResourceActions
 
 
 class LazyProx(App):
     BINDINGS: ClassVar[list[BindingType]] = [
         Binding("D", "dump_debug", "Dump debug", show=False),
+        ("b", "bulk", "Bulk"),
         ("f", "filter", "Filter"),
         ("s", "change_server", "Change server"),
         ("q", "quit", "Quit"),
@@ -316,6 +319,41 @@ class LazyProx(App):
             focused_widget.update_table_data()
 
         self.push_screen(FilterScreen(widget=focused_widget), check_filter)
+
+    def _bulk_highlighted_node(self) -> str | None:
+        try:
+            node_widget = self.screen.query_one(NodeWidget)
+        except NoMatches:
+            return None
+        if node_widget.row_count == 0 or node_widget.cursor_row < 0:
+            return None
+        return str(node_widget.get_row_at(node_widget.cursor_row)[0])
+
+    @work()
+    async def action_bulk(self) -> None:
+        if not isinstance(self.screen, DashboardScreen):
+            return
+
+        nodes, guests = snapshot_guests()
+        highlighted = self._bulk_highlighted_node()
+        state = None
+        while True:
+            submission = await self.push_screen_wait(
+                BulkScreen(nodes, guests, highlighted_node=highlighted, state=state)
+            )
+            if submission is None:
+                return
+            confirmed = await self.push_screen_wait(ConfirmationScreen(question=submission.message))
+            if not confirmed:
+                state = submission.as_state()
+                continue
+            summary = dispatch_bulk(submission.guests, submission.operation, target=submission.target)
+            self.notify(
+                message=summary.message,
+                title="Bulk",
+                severity="warning" if summary.failed else "information",
+            )
+            return
 
     def action_dump_debug(self):
         try:

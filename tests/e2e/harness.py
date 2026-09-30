@@ -1,7 +1,12 @@
+from pathlib import Path
+
 from textual.pilot import Pilot
 
+import lazyprox
 from lazyprox.app import LazyProx
 from lazyprox.screens import ServerSelectionScreen
+
+APP_STYLES_PATH = Path(lazyprox.__file__).parent / "app" / "styles.tcss"
 
 
 def make_app() -> LazyProx:

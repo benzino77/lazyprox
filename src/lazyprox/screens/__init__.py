@@ -1,3 +1,4 @@
+from .bulk import BulkScreen
 from .confirmation_screen import ConfirmationScreen
 from .dashboard import DashboardScreen
 from .filter import FilterScreen
@@ -7,6 +8,7 @@ from .waiting import WaitingScreen
 
 __all__ = [
     "ActionSelectionScreen",
+    "BulkScreen",
     "ConfirmationScreen",
     "DashboardScreen",
     "FilterScreen",
