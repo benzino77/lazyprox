@@ -4,17 +4,14 @@ from typing import Literal
 
 from lazyprox.data import ProxmoxData
 
+from .cluster_state import NodeState, online_node_names, snapshot_nodes
+from .guest_operations import perform_guest_operation
+
 Operation = Literal["start", "shutdown", "migrate"]
 GuestType = Literal["lxc", "qemu"]
 GuestKey = tuple[GuestType, int]
 
 _OPERATION_LABEL = {"start": "Start", "shutdown": "Shutdown", "migrate": "Migrate"}
-
-
-@dataclass(frozen=True)
-class BulkNode:
-    name: str
-    status: str
 
 
 @dataclass(frozen=True)
@@ -76,11 +73,7 @@ class BulkSummary:
         return summary_message(self.operation, self.requested, self.failed)
 
 
-def online_node_names(nodes: Sequence[BulkNode]) -> list[str]:
-    return [node.name for node in nodes if node.status == "online"]
-
-
-def migrate_available(nodes: Sequence[BulkNode]) -> bool:
+def migrate_available(nodes: Sequence[NodeState]) -> bool:
     return len(online_node_names(nodes)) >= 2
 
 
@@ -155,32 +148,13 @@ def summary_message(operation: Operation, requested: int, failed: int) -> str:
     return f"{label} requested for {requested} {word}"
 
 
-def snapshot_guests() -> tuple[list[BulkNode], list[BulkGuest]]:
-    raw_nodes = ProxmoxData.p_prox_resources.get(ProxmoxData.BASE_NODES, [])
-    nodes = [BulkNode(name=node["node"], status=str(node.get("status", ""))) for node in raw_nodes]
+def snapshot_guests() -> tuple[list[NodeState], list[BulkGuest]]:
+    nodes = snapshot_nodes()
     guests: list[BulkGuest] = []
     for guest_type in ("lxc", "qemu"):
         for raw in ProxmoxData.get_guests_list(guest_type):
             guests.append(BulkGuest.from_api(raw, guest_type))
     return nodes, guests
-
-
-def _post(prox, guest: BulkGuest, operation: Operation, target: str | None) -> None:
-    node_api = prox.nodes(guest.node)
-    guest_api = node_api.lxc(guest.vmid) if guest.guest_type == "lxc" else node_api.qemu(guest.vmid)
-    if operation == "start":
-        guest_api.status.post("start")
-        return
-    if operation == "shutdown":
-        guest_api.status.post("shutdown")
-        return
-    if guest.status == "running":
-        if guest.guest_type == "lxc":
-            guest_api.migrate.post(target=target, restart=1)
-        else:
-            guest_api.migrate.post(target=target, online=1, **{"with-local-disks": 1})
-        return
-    guest_api.migrate.post(target=target)
 
 
 def dispatch_bulk(
@@ -197,7 +171,15 @@ def dispatch_bulk(
     failed = 0
     for guest in guests:
         try:
-            _post(api, guest, operation, target)
+            perform_guest_operation(
+                api,
+                node=guest.node,
+                vmid=guest.vmid,
+                guest_type=guest.guest_type,
+                status=guest.status,
+                operation=operation,
+                target=target,
+            )
         except Exception:  # noqa: BLE001
             failed += 1
         else:

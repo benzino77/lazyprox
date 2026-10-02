@@ -4,7 +4,7 @@ import pytest
 from textual.widgets import Button, Select, SelectionList
 
 from lazyprox.app import LazyProx
-from lazyprox.app.bulk import BulkSummary
+from lazyprox.core.bulk import BulkSummary
 from lazyprox.data import ProxmoxData
 from lazyprox.screens import BulkScreen, ConfirmationScreen, DashboardScreen, ServerSelectionScreen
 from lazyprox.widgets import LxcWidget, NodeWidget

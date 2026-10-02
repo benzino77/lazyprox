@@ -29,8 +29,9 @@ Run: `docker run --name lazyprox -it --rm -v /path/to/config.toml:/config.toml g
 
 ## Key Directories
 - `src/lazyprox/` - Main application code
-- `src/lazyprox/app/` - Application logic and main class
+- `src/lazyprox/app/` - Textual application shell and main class
 - `src/lazyprox/common/` - Common utilities and config handling
+- `src/lazyprox/core/` - Application logic: action menus, guest operations, bulk operations, and cluster state
 - `src/lazyprox/screens/` - UI screens
 - `src/lazyprox/widgets/` - UI widgets
 

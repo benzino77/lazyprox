@@ -5,7 +5,7 @@
   - [ ] Add details view for selected cluster task
 - [x] Add sorting indicators to the table headers: an arrow pointing up for ascending order and an arrow pointing down for descending order next to the column name that is currently being sorted.
 - [x] Check possibility to add "bulk actions"
-- [ ] Check possibility to add action to migrate container/VM to another node if the cluster has more than one node
+- [x] Check possibility to add action to migrate container/VM to another node if the cluster has more than one node
 - [ ] Upload to PyPI and add installation instructions for pip
 - [x] Check if the tool can be run via docker and add instructions for that
 - [x] Add unit tests for the codebase

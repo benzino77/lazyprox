@@ -1,13 +1,15 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from lazyprox.app.bulk import (
+from lazyprox.core.bulk import (
     BulkGuest,
     confirmation_message,
     dispatch_bulk,
     eligible_guests,
 )
+from lazyprox.core.cluster_state import snapshot_nodes
+from lazyprox.data import ProxmoxData
 
 
 def guest(
@@ -186,3 +188,16 @@ def test_stopped_migrate_omits_online_and_restart():
     qemu_post = qemu_prox.nodes.return_value.qemu.return_value.migrate.post
     qemu_post.assert_called_once_with(target="pve2")
     assert "with-local-disks" not in qemu_post.call_args.kwargs
+
+
+def test_snapshot_nodes_reads_node_name_and_status():
+    resources = {
+        "nodes": [
+            {"node": "pve1", "status": "online"},
+            {"node": "pve2", "status": "offline"},
+        ]
+    }
+    with patch.object(ProxmoxData, "p_prox_resources", resources):
+        nodes = snapshot_nodes()
+
+    assert [(node.name, node.status) for node in nodes] == [("pve1", "online"), ("pve2", "offline")]
