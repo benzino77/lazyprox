@@ -2,16 +2,17 @@ import pytest
 from textual.app import App
 from textual.widgets import Button, Select, SelectionList
 
-from lazyprox.app.bulk import BulkGuest, BulkNode
+from lazyprox.core.bulk import BulkGuest
+from lazyprox.core.cluster_state import NodeState
 from lazyprox.screens.bulk import BulkScreen
 from tests.e2e.harness import APP_STYLES_PATH
 
 pytestmark = pytest.mark.e2e
 
 NODES = [
-    BulkNode("pve1", "online"),
-    BulkNode("pve2", "online"),
-    BulkNode("pve3", "offline"),
+    NodeState("pve1", "online"),
+    NodeState("pve2", "online"),
+    NodeState("pve3", "offline"),
 ]
 GUESTS = [
     BulkGuest(100, "db", "stopped", "qemu", "pve1"),
@@ -120,7 +121,7 @@ async def test_source_switch_clears_checks():
 
 
 async def test_migrate_hidden_when_fewer_than_two_nodes_are_online():
-    nodes = [BulkNode("pve1", "online"), BulkNode("pve3", "offline")]
+    nodes = [NodeState("pve1", "online"), NodeState("pve3", "offline")]
     app = Host(BulkScreen(nodes, GUESTS))
     async with app.run_test(size=(100, 40)) as pilot:
         await pilot.pause()

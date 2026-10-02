@@ -15,6 +15,27 @@ ActionSelectionScreen {
     width: 50;
 }
 
+DestinationSelectionScreen {
+    align: center middle;
+}
+
+#destination_dialog {
+    width: 50;
+    height: auto;
+    border: round $primary;
+    padding: 1;
+}
+
+#destination_label {
+    width: 100%;
+    margin-bottom: 1;
+    text-align: center;
+}
+
+#destination_select {
+    width: 100%;
+}
+
 RightColumn {
     width: 7fr;
     height: 99vh;

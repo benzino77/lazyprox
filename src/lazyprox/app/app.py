@@ -14,20 +14,20 @@ from textual.timer import Timer
 from textual.widgets import DataTable
 
 from lazyprox.common import Config
+from lazyprox.core.bulk import dispatch_bulk, snapshot_guests
+from lazyprox.core.resource_actions import ResourceActions
 from lazyprox.data import ProxmoxData
 from lazyprox.screens import (
     ActionSelectionScreen,
     BulkScreen,
     ConfirmationScreen,
     DashboardScreen,
+    DestinationSelectionScreen,
     FilterScreen,
     ServerSelectionScreen,
     WaitingScreen,
 )
 from lazyprox.widgets import LxcWidget, NodeWidget, QemuWidget
-
-from .bulk import dispatch_bulk, snapshot_guests
-from .resource_actions import ResourceActions
 
 
 class LazyProx(App):
@@ -283,16 +283,27 @@ class LazyProx(App):
             self.app.refresh()
             return
 
-        confirm_message = resource_actions.get_confirm_message(selected_action)
+        target = None
+        if selected_action == "Migrate":
+            target = await self.push_screen_wait(
+                DestinationSelectionScreen(resource_name, resource_actions.get_migration_targets())
+            )
+            if target is None:
+                return
+
+        confirm_message = resource_actions.get_confirm_message(selected_action, target=target)
         confirmed = await self.push_screen_wait(ConfirmationScreen(question=confirm_message))
         if not confirmed:
             return
 
         try:
-            resource_actions.perform_action(selected_action)
-            self.notify(
-                message=f"{selected_action} on {resource_name} successful", title="Action", severity="information"
+            resource_actions.perform_action(selected_action, target=target)
+            message = (
+                f"Migration of {resource_name} requested"
+                if selected_action == "Migrate"
+                else f"{selected_action} on {resource_name} successful"
             )
+            self.notify(message=message, title="Action", severity="information")
         except Exception as e:  # noqa: BLE001
             self._notify_error(str(e))
 

@@ -7,17 +7,16 @@ from textual.css.query import NoMatches
 from textual.screen import ModalScreen
 from textual.widgets import Button, Select, SelectionList
 
-from lazyprox.app.bulk import (
+from lazyprox.core.bulk import (
     BulkGuest,
-    BulkNode,
     BulkState,
     BulkSubmission,
     Operation,
     confirmation_message,
     eligible_guests,
-    online_node_names,
     row_prompt,
 )
+from lazyprox.core.cluster_state import NodeState, online_node_names
 
 
 def _node_value(value: object) -> str | None:
@@ -34,7 +33,7 @@ class BulkScreen(ModalScreen[BulkSubmission | None]):
 
     def __init__(
         self,
-        nodes: list[BulkNode],
+        nodes: list[NodeState],
         guests: list[BulkGuest],
         highlighted_node: str | None = None,
         state: BulkState | None = None,

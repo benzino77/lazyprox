@@ -65,6 +65,8 @@ Bulk operations are fire-and-forget: LazyProx sends one request per checked gues
 
 > [!IMPORTANT]
 > Migrate is experimental. It has been tested on a Proxmox cluster with native ZFS storage, where Proxmox uses ZFS mechanisms to move guests between nodes, and it may not work with other storage setups such as Ceph or NFS. Migrating a running QEMU virtual machine transfers its local disks and can take a long time. Running LXC containers are migrated in restart mode: the container is stopped, migrated, and started on the target node.
+>
+> The single-guest Enter menu offers the same Migrate action for running and stopped LXC containers and QEMU VMs when at least two nodes are online and the guest's node is online, with the same destination choices and caveats as the bulk dialog. Single-guest migrations are fire-and-forget too: the notification means Proxmox accepted the request, not that the migration has finished.
 
 ## Disclaimer
 
