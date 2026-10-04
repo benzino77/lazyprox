@@ -81,11 +81,47 @@ def type_label(guest_type: GuestType) -> str:
     return "VM" if guest_type == "qemu" else "LXC"
 
 
-def row_prompt(guest: BulkGuest, *, include_node: bool) -> str:
-    label = type_label(guest.guest_type)
+# Bulk guest rows must fit the SelectionList label area. The dialog is 80 columns
+# wide; its round border (2) and padding (2) leave 76. The SelectionList adds a
+# tall border (2) and horizontal padding (2), leaving 72, and its selection button
+# takes 4 more. Reserving the 2-cell vertical scrollbar plus one blank column
+# before it keeps rows clear of the scrollbar, so formatted rows target 65 columns.
+_ELLIPSIS = "…"
+_VMID_MIN_WIDTH = 6
+_VMID_MAX_WIDTH = 9
+_NAME_WIDTH = 29
+_TYPE_WIDTH = 3
+_NODE_WIDTH = 16
+_STATUS_WIDTH = 7
+
+
+def vmid_column_width(guests: Sequence[BulkGuest]) -> int:
+    """Widest VMID in the list, clamped to the column's minimum and maximum."""
+    widest = max((len(str(guest.vmid)) for guest in guests), default=_VMID_MIN_WIDTH)
+    return min(_VMID_MAX_WIDTH, max(_VMID_MIN_WIDTH, widest))
+
+
+def _truncate(text: str, width: int) -> str:
+    if len(text) <= width:
+        return text
+    return f"{text[: width - 1]}{_ELLIPSIS}"
+
+
+def _fit(text: str, width: int) -> str:
+    return _truncate(text, width).ljust(width)
+
+
+def row_prompt(guest: BulkGuest, *, include_node: bool, vmid_width: int = _VMID_MIN_WIDTH) -> str:
+    name_width = _NAME_WIDTH - (vmid_width - _VMID_MIN_WIDTH)
+    columns = [
+        str(guest.vmid).rjust(vmid_width),
+        _fit(guest.name, name_width),
+        _fit(type_label(guest.guest_type), _TYPE_WIDTH),
+    ]
     if include_node:
-        return f"{guest.vmid}  {guest.name}  {label}  {guest.node}  {guest.status}"
-    return f"{guest.vmid}  {guest.name}  {label}  {guest.status}"
+        columns.append(_fit(guest.node, _NODE_WIDTH))
+    columns.append(_truncate(guest.status, _STATUS_WIDTH))
+    return " ".join(columns).rstrip()
 
 
 def eligible_guests(

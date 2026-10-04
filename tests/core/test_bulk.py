@@ -7,6 +7,8 @@ from lazyprox.core.bulk import (
     confirmation_message,
     dispatch_bulk,
     eligible_guests,
+    row_prompt,
+    vmid_column_width,
 )
 from lazyprox.core.cluster_state import snapshot_nodes
 from lazyprox.data import ProxmoxData
@@ -201,3 +203,116 @@ def test_snapshot_nodes_reads_node_name_and_status():
         nodes = snapshot_nodes()
 
     assert [(node.name, node.status) for node in nodes] == [("pve1", "online"), ("pve2", "offline")]
+
+
+ROW_BUDGET = 65
+
+
+def test_row_prompt_aligns_columns_across_different_name_lengths():
+    guests = [
+        guest(100, name="db", node="pve1"),
+        guest(101, name="web-frontend-eu-west", guest_type="lxc", node="pve2"),
+        guest(200, name="cache", status="running", node="pve1"),
+    ]
+    vmid_width = vmid_column_width(guests)
+    rows = [(row_prompt(row, include_node=True, vmid_width=vmid_width), row) for row in guests]
+
+    columns = {
+        (
+            prompt.index(row.name),
+            prompt.index("LXC" if row.guest_type == "lxc" else "VM"),
+            prompt.index(row.node),
+            prompt.index(row.status),
+        )
+        for prompt, row in rows
+    }
+    assert len(columns) == 1
+    assert all(len(prompt) <= ROW_BUDGET for prompt, _ in rows)
+
+
+def test_row_prompt_truncates_long_guest_name_to_its_column():
+    long_name = "guest-name-" + "x" * 40
+    prompt = row_prompt(guest(100, name=long_name, node="pve1"), include_node=True, vmid_width=6)
+
+    columns = prompt.split()
+    assert columns[0] == "100"
+    assert columns[1].endswith("…")
+    assert len(columns[1]) == 29
+    assert long_name not in prompt
+    assert columns[2:] == ["VM", "pve1", "stopped"]
+    assert len(prompt) <= ROW_BUDGET
+
+
+def test_row_prompt_truncates_long_node_name_to_its_column():
+    long_node = "node-" + "y" * 30
+    prompt = row_prompt(guest(100, name="db", node=long_node), include_node=True, vmid_width=6)
+
+    columns = prompt.split()
+    assert columns[1] == "db"
+    assert columns[3].endswith("…")
+    assert len(columns[3]) == 16
+    assert long_node not in prompt
+    assert columns[4] == "stopped"
+    assert len(prompt) <= ROW_BUDGET
+
+
+def test_row_prompt_migrate_rows_omit_node_and_stay_aligned():
+    guests = [
+        guest(100, name="db", node="pve1"),
+        guest(101, name="web-frontend-eu-west", guest_type="lxc", node="pve1"),
+    ]
+    vmid_width = vmid_column_width(guests)
+    rows = [(row_prompt(row, include_node=False, vmid_width=vmid_width), row) for row in guests]
+
+    assert all(row.node not in prompt for prompt, row in rows)
+    assert all(len(prompt.split()) == 4 for prompt, _ in rows)
+    columns = {
+        (
+            prompt.index(row.name),
+            prompt.index("LXC" if row.guest_type == "lxc" else "VM"),
+            prompt.index(row.status),
+        )
+        for prompt, row in rows
+    }
+    assert len(columns) == 1
+    assert all(len(prompt) <= ROW_BUDGET for prompt, _ in rows)
+
+
+def test_row_prompt_fits_the_budget_for_extreme_values():
+    extreme = guest(999999999, name="n" * 80, status="suspended", node="h" * 80)
+    vmid_width = vmid_column_width([extreme])
+
+    for include_node in (True, False):
+        prompt = row_prompt(extreme, include_node=include_node, vmid_width=vmid_width)
+        assert len(prompt) <= ROW_BUDGET
+        assert str(extreme.vmid) in prompt
+        assert "…" in prompt
+
+
+def test_vmid_column_width_tracks_the_widest_vmid():
+    assert vmid_column_width([]) == 6
+    assert vmid_column_width([guest(100)]) == 6
+    assert vmid_column_width([guest(100), guest(1000000)]) == 7
+    assert vmid_column_width([guest(100), guest(999999999)]) == 9
+
+
+def test_wide_vmid_keeps_rows_at_the_budget_width():
+    guests = [
+        guest(100, name="db", node="pve1"),
+        guest(1000000, name="big-db", status="running", node="pve1"),
+    ]
+    vmid_width = vmid_column_width(guests)
+    assert vmid_width == 7
+
+    for row in guests:
+        prompt = row_prompt(row, include_node=True, vmid_width=vmid_width)
+        assert str(row.vmid) in prompt
+        assert len(prompt) <= ROW_BUDGET
+
+
+def test_truncated_row_still_exposes_guest_identity():
+    longname = guest(100, name="a" * 60, guest_type="lxc", node="pve1")
+    prompt = row_prompt(longname, include_node=True, vmid_width=vmid_column_width([longname]))
+
+    assert str(longname.vmid) in prompt
+    assert "LXC" in prompt

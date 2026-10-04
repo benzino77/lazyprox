@@ -15,6 +15,7 @@ from lazyprox.core.bulk import (
     confirmation_message,
     eligible_guests,
     row_prompt,
+    vmid_column_width,
 )
 from lazyprox.core.cluster_state import NodeState, online_node_names
 
@@ -88,13 +89,15 @@ class BulkScreen(ModalScreen[BulkSubmission | None]):
 
     def _rebuild_guests(self) -> None:
         include_node = self._operation != "migrate"
+        guests = eligible_guests(self.guests, self._operation, self._source)
+        vmid_width = vmid_column_width(guests)
         options = [
             (
-                row_prompt(guest, include_node=include_node),
+                row_prompt(guest, include_node=include_node, vmid_width=vmid_width),
                 (guest.guest_type, guest.vmid),
                 (guest.guest_type, guest.vmid) in self._checked,
             )
-            for guest in eligible_guests(self.guests, self._operation, self._source)
+            for guest in guests
         ]
         guest_list = self._guest_list()
         guest_list.clear_options()

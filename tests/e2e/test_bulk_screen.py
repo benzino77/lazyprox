@@ -42,6 +42,30 @@ def prompts(guest_list: SelectionList) -> list[str]:
     return [str(option.prompt) for option in guest_list.options]
 
 
+def assert_rows_aligned(rows: list[str]) -> None:
+    assert rows
+    columns = set()
+    for row in rows:
+        assert len(row) <= 65
+        fields = row.split()
+        assert len(fields) == 5
+        guest_type, node, status = fields[2], fields[3], fields[4]
+        columns.add((row.index(guest_type), row.index(node), row.index(status)))
+    assert len(columns) == 1
+
+
+async def test_start_and_shutdown_rows_render_aligned_columns_within_budget():
+    app = Host(BulkScreen(NODES, GUESTS))
+    async with app.run_test(size=(100, 40)) as pilot:
+        await pilot.pause()
+        guest_list = app.screen.query_one("#bulk_guests", SelectionList)
+        assert_rows_aligned(prompts(guest_list))
+
+        app.screen.query_one("#bulk_operation", Select).value = "shutdown"
+        await pilot.pause()
+        assert_rows_aligned(prompts(guest_list))
+
+
 def test_bulk_dialog_snapshot(snap_compare):
     assert snap_compare(
         Host(BulkScreen(NODES, GUESTS)),
