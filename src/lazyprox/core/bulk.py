@@ -145,6 +145,24 @@ def eligible_guests(
     return sorted(selected, key=lambda guest: (guest.guest_type, guest.vmid))
 
 
+def offerable_operations(guests: Sequence[BulkGuest], nodes: Sequence[NodeState]) -> tuple[Operation, ...]:
+    """Bulk operations that can act on at least one guest, in dialog order."""
+    operations: list[Operation] = []
+    if eligible_guests(guests, "start"):
+        operations.append("start")
+    if eligible_guests(guests, "shutdown"):
+        operations.append("shutdown")
+    if migrate_available(nodes):
+        operations.append("migrate")
+    return tuple(operations)
+
+
+def first_operation(guests: Sequence[BulkGuest], nodes: Sequence[NodeState]) -> Operation | None:
+    """The operation a freshly opened bulk dialog selects, if any is available."""
+    operations = offerable_operations(guests, nodes)
+    return operations[0] if operations else None
+
+
 def _guest_word(count: int) -> str:
     return "guest" if count == 1 else "guests"
 

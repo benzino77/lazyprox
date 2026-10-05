@@ -14,10 +14,14 @@ from lazyprox.core.bulk import (
     Operation,
     confirmation_message,
     eligible_guests,
+    first_operation,
+    offerable_operations,
     row_prompt,
     vmid_column_width,
 )
 from lazyprox.core.cluster_state import NodeState, online_node_names
+
+_OPERATION_LABELS: dict[Operation, str] = {"start": "Start", "shutdown": "Shutdown", "migrate": "Migrate"}
 
 
 def _node_value(value: object) -> str | None:
@@ -43,25 +47,24 @@ class BulkScreen(ModalScreen[BulkSubmission | None]):
         self.nodes = list(nodes)
         self.guests = list(guests)
         self.highlighted_node = highlighted_node
-        if state is None:
-            self._operation: Operation = "start"
-            self._checked: set[tuple[str, int]] = set()
-            self._source: str | None = None
-            self._target: str | None = None
-        else:
+        offered = offerable_operations(self.guests, self.nodes)
+        if state is not None and state.operation in offered:
             self._operation = state.operation
             self._checked = set(state.checked)
             self._source = state.source
             self._target = state.target
+        else:
+            self._operation: Operation = first_operation(self.guests, self.nodes) or "start"
+            self._checked: set[tuple[str, int]] = set()
+            self._source: str | None = None
+            self._target: str | None = None
         self._applied_operation = self._operation
         self._applied_source = self._source
         self._suppress = False
 
     def _operation_options(self) -> list[tuple[str, str]]:
-        options = [("Start", "start"), ("Shutdown", "shutdown")]
-        if len(online_node_names(self.nodes)) >= 2:
-            options.append(("Migrate", "migrate"))
-        return options
+        operations = offerable_operations(self.guests, self.nodes)
+        return [(_OPERATION_LABELS[operation], operation) for operation in operations]
 
     def compose(self) -> ComposeResult:
         with Vertical(id="bulk_dialog"):
