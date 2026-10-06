@@ -14,7 +14,7 @@ from textual.timer import Timer
 from textual.widgets import DataTable
 
 from lazyprox.common import Config
-from lazyprox.core.bulk import dispatch_bulk, snapshot_guests
+from lazyprox.core.bulk import dispatch_bulk, first_operation, snapshot_guests
 from lazyprox.core.resource_actions import ResourceActions
 from lazyprox.data import ProxmoxData
 from lazyprox.screens import (
@@ -346,6 +346,13 @@ class LazyProx(App):
             return
 
         nodes, guests = snapshot_guests()
+        if first_operation(guests, nodes) is None:
+            self.notify(
+                message="No bulk operation is available",
+                title="Bulk",
+                severity="information",
+            )
+            return
         highlighted = self._bulk_highlighted_node()
         state = None
         while True:

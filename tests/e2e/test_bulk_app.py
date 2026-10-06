@@ -25,6 +25,29 @@ RESOURCES = {
     "nodes/pve2/qemu": [{"vmid": 200, "name": "app", "status": "running", "template": 0}],
 }
 
+RUNNING_ONLY_RESOURCES = {
+    "nodes": [
+        {"node": "pve1", "status": "online", "mem": 1, "maxmem": 2, "cpu": 0.1},
+        {"node": "pve2", "status": "online", "mem": 1, "maxmem": 2, "cpu": 0.1},
+    ],
+    "nodes/pve1/status": {},
+    "nodes/pve2/status": {},
+    "nodes/pve1/lxc": [],
+    "nodes/pve1/qemu": [{"vmid": 100, "name": "db", "status": "running", "template": 0}],
+    "nodes/pve2/lxc": [],
+    "nodes/pve2/qemu": [],
+}
+
+NO_BULK_RESOURCES = {
+    "nodes": [{"node": "pve1", "status": "online", "mem": 1, "maxmem": 2, "cpu": 0.1}],
+    "nodes/pve1/status": {},
+    "nodes/pve1/lxc": [],
+    "nodes/pve1/qemu": [
+        {"vmid": 100, "name": "db", "status": "stopped", "template": 1},
+        {"vmid": 101, "name": "app", "status": "paused", "template": 0},
+    ],
+}
+
 
 def dashboard_mount(self) -> None:
     self.push_screen("dashboard")
@@ -34,6 +57,22 @@ def dashboard_mount(self) -> None:
 def seeded_proxmox():
     previous = ProxmoxData.p_prox_resources
     ProxmoxData.p_prox_resources = RESOURCES
+    yield
+    ProxmoxData.p_prox_resources = previous
+
+
+@pytest.fixture
+def seeded_running_only():
+    previous = ProxmoxData.p_prox_resources
+    ProxmoxData.p_prox_resources = RUNNING_ONLY_RESOURCES
+    yield
+    ProxmoxData.p_prox_resources = previous
+
+
+@pytest.fixture
+def seeded_no_bulk():
+    previous = ProxmoxData.p_prox_resources
+    ProxmoxData.p_prox_resources = NO_BULK_RESOURCES
     yield
     ProxmoxData.p_prox_resources = previous
 
@@ -59,7 +98,29 @@ async def test_b_does_not_open_bulk_on_server_selection():
         assert not any(isinstance(screen, BulkScreen) for screen in app.screen_stack)
 
 
-async def test_no_reopens_bulk_with_operation_checks_source_and_target(seeded_proxmox):
+async def test_no_bulk_operation_notifies_and_keeps_dashboard(seeded_no_bulk):
+    app = LazyProx()
+    with (
+        patch.object(LazyProx, "on_mount", dashboard_mount),
+        patch.object(app, "notify") as notify,
+    ):
+        async with app.run_test(size=(100, 40)) as pilot:
+            await wait_for_type(pilot, DashboardScreen)
+            await pilot.press("b")
+            for _ in range(50):
+                if any(
+                    call.kwargs.get("message") == "No bulk operation is available" for call in notify.call_args_list
+                ):
+                    break
+                await pilot.pause()
+            else:
+                raise AssertionError("Expected a no-operation notification")
+
+            assert not any(isinstance(screen, BulkScreen) for screen in app.screen_stack)
+            assert isinstance(app.screen, DashboardScreen)
+
+
+async def test_no_reopens_bulk_with_operation_checks_source_and_target(seeded_running_only):
     app = LazyProx()
     with (
         patch.object(LazyProx, "on_mount", dashboard_mount),
@@ -70,7 +131,11 @@ async def test_no_reopens_bulk_with_operation_checks_source_and_target(seeded_pr
             await pilot.press("b")
             await wait_for_type(pilot, BulkScreen)
 
-            app.screen.query_one("#bulk_operation", Select).value = "migrate"
+            operation = app.screen.query_one("#bulk_operation", Select)
+            assert [value for _, value in operation._options] == ["shutdown", "migrate"]
+            assert operation.value == "shutdown"
+
+            operation.value = "migrate"
             await pilot.pause()
             app.screen.query_one("#bulk_source", Select).value = "pve1"
             await pilot.pause()

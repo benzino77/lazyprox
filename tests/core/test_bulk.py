@@ -7,10 +7,12 @@ from lazyprox.core.bulk import (
     confirmation_message,
     dispatch_bulk,
     eligible_guests,
+    first_operation,
+    offerable_operations,
     row_prompt,
     vmid_column_width,
 )
-from lazyprox.core.cluster_state import snapshot_nodes
+from lazyprox.core.cluster_state import NodeState, snapshot_nodes
 from lazyprox.data import ProxmoxData
 
 
@@ -74,6 +76,39 @@ def test_migrate_is_limited_to_the_source_node():
     assert all(row.vmid != 300 for row in rows)
     assert all(not row.template for row in rows)
     assert eligible_guests(MIXED, "migrate", source=None) == []
+
+
+TWO_ONLINE = [NodeState("pve1", "online"), NodeState("pve2", "online")]
+ONE_ONLINE = [NodeState("pve1", "online"), NodeState("pve2", "offline")]
+
+
+def test_offerable_operations_keep_only_operations_with_eligible_guests():
+    assert offerable_operations(MIXED, TWO_ONLINE) == ("start", "shutdown", "migrate")
+    assert offerable_operations(MIXED, ONE_ONLINE) == ("start", "shutdown")
+
+    stopped_only = [guest(100), guest(101, guest_type="lxc")]
+    assert offerable_operations(stopped_only, TWO_ONLINE) == ("start", "migrate")
+    assert offerable_operations(stopped_only, ONE_ONLINE) == ("start",)
+
+    running_only = [guest(200, status="running"), guest(201, status="running", guest_type="lxc")]
+    assert offerable_operations(running_only, TWO_ONLINE) == ("shutdown", "migrate")
+    assert offerable_operations(running_only, ONE_ONLINE) == ("shutdown",)
+
+    templates_only = [
+        guest(300, template=True),
+        guest(301, status="running", guest_type="lxc", template=True),
+    ]
+    assert offerable_operations(templates_only, TWO_ONLINE) == ("migrate",)
+    assert offerable_operations(templates_only, ONE_ONLINE) == ()
+    assert offerable_operations([], ONE_ONLINE) == ()
+
+
+def test_first_operation_follows_dialog_order_and_is_none_when_empty():
+    assert first_operation(MIXED, ONE_ONLINE) == "start"
+    assert first_operation([guest(200, status="running")], ONE_ONLINE) == "shutdown"
+    assert first_operation([guest(300, template=True)], TWO_ONLINE) == "migrate"
+    assert first_operation([guest(300, template=True)], ONE_ONLINE) is None
+    assert first_operation([], []) is None
 
 
 @pytest.mark.parametrize(

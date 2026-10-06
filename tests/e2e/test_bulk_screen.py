@@ -2,7 +2,7 @@ import pytest
 from textual.app import App
 from textual.widgets import Button, Select, SelectionList
 
-from lazyprox.core.bulk import BulkGuest
+from lazyprox.core.bulk import BulkGuest, BulkState
 from lazyprox.core.cluster_state import NodeState
 from lazyprox.screens.bulk import BulkScreen
 from tests.e2e.harness import APP_STYLES_PATH
@@ -151,6 +151,68 @@ async def test_migrate_hidden_when_fewer_than_two_nodes_are_online():
         await pilot.pause()
         values = [value for _, value in app.screen.query_one("#bulk_operation", Select)._options]
         assert values == ["start", "shutdown"]
+
+
+async def test_start_hidden_when_no_guest_is_stopped():
+    running = [guest for guest in GUESTS if guest.status == "running"]
+    app = Host(BulkScreen(NODES, running))
+    async with app.run_test(size=(100, 40)) as pilot:
+        await pilot.pause()
+        operation = app.screen.query_one("#bulk_operation", Select)
+        assert [value for _, value in operation._options] == ["shutdown", "migrate"]
+        assert operation.value == "shutdown"
+        shown = " ".join(prompts(app.screen.query_one("#bulk_guests", SelectionList)))
+        assert "200" in shown and "app" in shown
+        assert "201" in shown and "cache" in shown
+
+
+async def test_shutdown_hidden_when_no_guest_is_running():
+    stopped = [guest for guest in GUESTS if guest.status == "stopped"]
+    app = Host(BulkScreen(NODES, stopped))
+    async with app.run_test(size=(100, 40)) as pilot:
+        await pilot.pause()
+        operation = app.screen.query_one("#bulk_operation", Select)
+        assert [value for _, value in operation._options] == ["start", "migrate"]
+        assert operation.value == "start"
+        assert len(prompts(app.screen.query_one("#bulk_guests", SelectionList))) == 3
+
+
+async def test_default_operation_follows_the_offered_set():
+    stopped_only = [BulkGuest(100, "db", "stopped", "qemu", "pve1")]
+    running_only = [BulkGuest(200, "app", "running", "qemu", "pve2")]
+
+    app = Host(BulkScreen(NODES, stopped_only))
+    async with app.run_test(size=(100, 40)) as pilot:
+        await pilot.pause()
+        assert app.screen.query_one("#bulk_operation", Select).value == "start"
+
+    app = Host(BulkScreen(NODES, running_only))
+    async with app.run_test(size=(100, 40)) as pilot:
+        await pilot.pause()
+        assert app.screen.query_one("#bulk_operation", Select).value == "shutdown"
+
+
+async def test_templates_do_not_keep_start_or_shutdown_offered():
+    templates = [
+        BulkGuest(300, "tpl-vm", "stopped", "qemu", "pve1", template=True),
+        BulkGuest(301, "tpl-ct", "running", "lxc", "pve1", template=True),
+    ]
+    app = Host(BulkScreen(NODES, templates))
+    async with app.run_test(size=(100, 40)) as pilot:
+        await pilot.pause()
+        operation = app.screen.query_one("#bulk_operation", Select)
+        assert [value for _, value in operation._options] == ["migrate"]
+        assert operation.value == "migrate"
+
+
+async def test_restored_operation_falls_back_when_not_offered():
+    stopped_only = [BulkGuest(100, "db", "stopped", "qemu", "pve1")]
+    state = BulkState(operation="shutdown", checked=frozenset({("qemu", 100)}))
+    app = Host(BulkScreen(NODES, stopped_only, state=state))
+    async with app.run_test(size=(100, 40)) as pilot:
+        await pilot.pause()
+        assert app.screen.query_one("#bulk_operation", Select).value == "start"
+        assert app.screen.query_one("#bulk_guests", SelectionList).selected == []
 
 
 async def test_online_highlighted_node_prefills_source_and_run_waits_for_target():
