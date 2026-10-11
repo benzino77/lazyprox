@@ -2,7 +2,7 @@
 name = "lazyprox"
 license = "MIT"
 license-files = [ "LICENSE" ]
-version = "0.9.0"
+version = "0.9.1"
 description = "Proxmox TUI"
 keywords = [ "proxmox", "terminal", "TUI", "client", "console" ]
 readme = "README.md"
