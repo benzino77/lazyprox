@@ -77,6 +77,15 @@ class BaseDataTableWidget(DataTable):
                 selected_type=self.table_type, data=None, details_mode=self.details_mode[0]
             )
 
+    def _details_view_visible(self) -> bool:
+        """Return True when the details pane currently displays this table's view."""
+        try:
+            details_widget = self.screen.query_one(self.details_widget)
+        except NoMatches:
+            return False
+        current = getattr(details_widget, "current", None)
+        return bool(current) and str(current).startswith(f"{self.table_type}_")
+
     def build_row(self) -> Iterable:
         """
         This method must be implemented in the child class.
@@ -173,7 +182,7 @@ class BaseDataTableWidget(DataTable):
             # selected an index of a row which key is stored in the row_index_position element of the selected row
             selected_row_index = self.get_row_index(selected_row[self.row_index_position])
             self.move_cursor(row=selected_row_index, scroll=True)
-        if has_focus:
+        if has_focus or self._details_view_visible():
             self._call_update_details()
 
     def on_mount(self) -> None:

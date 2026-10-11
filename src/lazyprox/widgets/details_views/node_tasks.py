@@ -1,7 +1,9 @@
+import re
 from datetime import UTC, datetime
 
 from textual.widgets import DataTable, data_table
 
+from lazyprox.common import set_focus_border
 from lazyprox.data import ProxmoxData
 
 TASK_DESCRIPTIONS: dict[str, str] = {
@@ -30,10 +32,18 @@ TASK_DESCRIPTIONS: dict[str, str] = {
 
 
 class NodeTasksWidget(DataTable):
+    # text used by the dashboard filter action to filter the task rows,
+    # the same contract as BaseDataTableWidget.filter_text
+    filter_text: str = ""
+
     # for now this widget is only for displaying cluster tasks, so it does not need to propagate "selected" event
     # it will be then implemented in the future displaying details of the selected task
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         event.stop()
+
+    def on_focus(self, event) -> None:
+        # the task list has no border of its own: its focus is shown on the details pane border
+        set_focus_border(self.screen.query_one("RightColumn"))
 
     def on_mount(self) -> None:
         self.add_column("Start Time")
@@ -44,6 +54,18 @@ class NodeTasksWidget(DataTable):
         self.add_column("Status")
         self.show_header = True
         self.cursor_type = "row"
+
+    def remove_border_indicator(self, indicator: str) -> None:
+        self._refresh_details_border_title()
+
+    def add_border_indicator(self, indicator: str) -> None:
+        self._refresh_details_border_title()
+
+    def _refresh_details_border_title(self) -> None:
+        # the details pane (parent by composition) owns the border shown for the task list
+        refresh = getattr(self.parent, "refresh_border_title", None)
+        if callable(refresh):
+            refresh()
 
     def get_current_tasks_list(self) -> list[tuple]:
         """Build list of tuples from the current DataTable rows."""
@@ -84,9 +106,18 @@ class NodeTasksWidget(DataTable):
                 desc = desc_template.format(id=task["id"]) if "{id}" in desc_template else desc_template
             else:
                 desc = f"{task['type']} {task['id']}".strip()
-            new_list.append(
-                (start_str, end_str, task["node"], task["user"], desc, task.get("status", "Running"), task["upid"])
+            task_row = (
+                start_str,
+                end_str,
+                task["node"],
+                task["user"],
+                desc,
+                task.get("status", "Running"),
+                task["upid"],
             )
+            if self.filter_text and not re.search(self.filter_text, " ".join(task_row[:-1])):
+                continue
+            new_list.append(task_row)
 
         return new_list
 
@@ -95,6 +126,11 @@ class NodeTasksWidget(DataTable):
             self.clear()
             return
 
+        self.update_table_data()
+
+    def update_table_data(self) -> None:
+        # keep the details pane border in sync with the filter state, even when the rows do not change
+        self._refresh_details_border_title()
         if not self.has_tasks_changed():
             return
 

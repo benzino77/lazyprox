@@ -57,7 +57,7 @@ def test_set_focus_border_removes_unfocused_and_adds_focused():
 
     set_focus_border(handler)
 
-    handler.screen.query.assert_called_once_with("LeftColumn DataTable")
+    handler.screen.query.assert_called_once_with("LeftColumn DataTable, RightColumn")
     for widget in (widget_a, widget_b):
         widget.remove_class.assert_called_once_with("focused", "unfocused")
         widget.add_class.assert_called_once_with("unfocused")

@@ -10,10 +10,11 @@ def set_focus_border(handler: Widget) -> None:
     Returns:
         None
     """
-    # get all DataTable widgets
-    data_table_widgets = handler.screen.query("LeftColumn DataTable")
+    # get all dashboard widgets which can take focus: data tables in the left column
+    # and the details pane, which is marked when the node task list has focus
+    focusable_widgets = handler.screen.query("LeftColumn DataTable, RightColumn")
     # set all widgets to class unfocused
-    for widget in data_table_widgets:
+    for widget in focusable_widgets:
         widget.remove_class("focused", "unfocused")
         widget.add_class("unfocused")
 
