@@ -28,6 +28,7 @@ from lazyprox.screens import (
     WaitingScreen,
 )
 from lazyprox.widgets import LxcWidget, NodeWidget, QemuWidget
+from lazyprox.widgets.details_views import NodeTasksWidget
 
 
 class LazyProx(App):
@@ -241,7 +242,8 @@ class LazyProx(App):
 
         # update widgets if the data is available it will display gathered information
         # in other case the data in widgets will be cleared
-        for widget_type in [NodeWidget, LxcWidget, QemuWidget]:
+        # the node task list is included so its filter is cleared when the server changes as well
+        for widget_type in [NodeWidget, LxcWidget, QemuWidget, NodeTasksWidget]:
             try:
                 widget = self.screen.query_one(widget_type)
                 widget.filter_text = ""
@@ -318,7 +320,9 @@ class LazyProx(App):
         if not isinstance(self.screen, DashboardScreen):
             return
 
-        focused_widget = self.screen.query_one(".focused")
+        focused_widget = self.focused
+        if focused_widget is None:
+            return
 
         def check_filter(text: str | None) -> None:
             # add indicator that data in the DataTable is filtered

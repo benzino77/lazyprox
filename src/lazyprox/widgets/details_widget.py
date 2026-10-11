@@ -27,9 +27,6 @@ class DetailsWidget(ContentSwitcher):
     def update_details_data(
         self, selected_type: Literal["node", "lxc", "qemu"], data: list[str] | None, details_mode: str | None
     ) -> None:
-        if details_mode:
-            self.parent.border_title = details_mode.replace("_", " ").capitalize()
-
         if selected_type == "node":
             if details_mode == "summary":
                 self.current = "node_summary_widget"
@@ -54,3 +51,15 @@ class DetailsWidget(ContentSwitcher):
             elif details_mode == "graphs":
                 self.current = "qemu_graphs_widget"
                 self.query_one("QemuGraphWidget").update_data(data=data)
+        self.refresh_border_title()
+
+    def refresh_border_title(self) -> None:
+        """Set the pane border title to the displayed view name, with a filter indicator when the view is filtered."""
+        current = self.current
+        if not current:
+            return
+        view_name = current.removesuffix("_widget").split("_", 1)[-1].capitalize()
+        visible_view = self.visible_content
+        if visible_view is not None and getattr(visible_view, "filter_text", ""):
+            view_name = f"{view_name} (F)"
+        self.parent.border_title = view_name
