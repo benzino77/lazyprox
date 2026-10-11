@@ -1,0 +1,52 @@
+name: Publish to TestPyPI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Build and publish to TestPyPI
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Verify tag matches package version
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(uv version --short)"
+          expected_tag="v${version}"
+          if [ "${GITHUB_REF_NAME:-}" != "${expected_tag}" ]; then
+            echo "::error::Ref '${GITHUB_REF_NAME:-<unknown>}' does not match package version tag '${expected_tag}'. Refusing to publish."
+            exit 1
+          fi
+          echo "Publishing version ${version} from ${GITHUB_REF_NAME}"
+
+      - name: Build distributions
+        run: uv build --no-sources
+
+      - name: Inspect distributions
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -1 dist/*.whl dist/*.tar.gz
+          wheel="$(ls dist/*.whl)"
+          if ! unzip -l "$wheel" | grep -q "lazyprox/app/styles.tcss"; then
+            echo "::error::lazyprox/app/styles.tcss is missing from the wheel"
+            exit 1
+          fi
+
+      - name: Publish to TestPyPI
+        run: uv publish --index testpypi --trusted-publishing always
