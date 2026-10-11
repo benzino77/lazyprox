@@ -1,6 +1,7 @@
 [project]
 name = "lazyprox"
 license = "MIT"
+license-files = [ "LICENSE" ]
 version = "0.9.0"
 description = "Proxmox TUI"
 keywords = [ "proxmox", "terminal", "TUI", "client", "console" ]
@@ -21,9 +22,20 @@ dependencies = [
 [project.scripts]
 lazyprox = "lazyprox:main"
 
+[project.urls]
+homepage = "https://github.com/benzino77/lazyprox"
+repository = "https://github.com/benzino77/lazyprox"
+issues = "https://github.com/benzino77/lazyprox/issues"
+
 [build-system]
-requires = ["uv_build>=0.9.27,<0.10.0"]
+requires = ["uv_build>=0.13.0,<0.14"]
 build-backend = "uv_build"
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
 
 [dependency-groups]
 dev = [

@@ -1,14 +1,14 @@
 <div align="center">
-  <img src="./docs/images/lazyprox-logo.svg" width="60%">
+  <img src="https://raw.githubusercontent.com/benzino77/lazyprox/master/docs/images/lazyprox-logo.svg" width="60%">
 </div>
 
 # LazyProx
 
 LazyProx is a lightweight Proxmox management helper that makes it easy to view and act on nodes, containers, and virtual machines. It provides a clean UI for exploring your Proxmox infrastructure and quickly selecting actions.
 
-![view-1](./docs/images/main-graph.png)
-![view-2](./docs/images/main-summary.png)
-![view-3](./docs/images/main-action.png)
+![view-1](https://raw.githubusercontent.com/benzino77/lazyprox/master/docs/images/main-graph.png)
+![view-2](https://raw.githubusercontent.com/benzino77/lazyprox/master/docs/images/main-summary.png)
+![view-3](https://raw.githubusercontent.com/benzino77/lazyprox/master/docs/images/main-action.png)
 
 See the included asciinema animation for a short demo of how the tool works.
 
@@ -16,14 +16,16 @@ See the included asciinema animation for a short demo of how the tool works.
 
 ## Installation
 
-You have to have Python 3.10 or higher installed on your system to run the tool. LazyProx is developed and tested on Linux, it is tested also on Windows WSL2, but it should work on any platform that supports Python.
+You have to have Python 3.13 or higher installed on your system to run the tool. LazyProx is developed and tested on Linux, it is tested also on Windows WSL2, but it should work on any platform that supports Python.
+
+LazyProx is published on [PyPI](https://pypi.org/project/lazyprox/), so you can install it with any Python package manager. The instructions below use `uv` and `pipx`.
 
 > [!NOTE]
 > LazyProx is using HTTP API of Proxmox, so you need to have access to it from the machine you want to run the tool on. 
 
 ### Using UV
 
-to install run `uv tool install git+https://github.com/benzino77/lazyprox.git`
+to install run `uv tool install lazyprox`
 
 to upgrade run `uv tool upgrade lazyprox`
 
@@ -34,11 +36,19 @@ to uninstall run `uv tool uninstall lazyprox`
 
 ### Using pipx
 
-to install run `pipx install git+https://github.com/benzino77/lazyprox.git`
+to install run `pipx install lazyprox`
 
 to upgrade run `pipx upgrade lazyprox`
 
 to uninstall run `pipx uninstall lazyprox`
+
+### From source
+
+If you want the latest development version, you can install directly from GitHub:
+
+to install run `uv tool install git+https://github.com/benzino77/lazyprox.git`
+
+or with pipx `pipx install git+https://github.com/benzino77/lazyprox.git`
 
 ## Running
 
